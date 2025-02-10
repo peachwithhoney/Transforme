@@ -6,4 +6,7 @@
  *
  */
 module Transforme {
+	
+	requires java.sql;
+
 }

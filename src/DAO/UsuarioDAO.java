@@ -115,9 +115,8 @@ public class UsuarioDAO {
                 String nome = rs.getString("nome");
                 String emailDb = rs.getString("email");
                 String senhaDb = rs.getString("senha");
-                // Cria o usuário e marca como "logado"
                 Usuario usuario = new Usuario(id, nome, emailDb, senhaDb);
-                usuario.setLogado(true); // Definir o usuário como logado
+                usuario.setLogado(true); 
                 return usuario;
             } else {
                 System.out.println("E-mail ou senha incorretos.");

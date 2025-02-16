@@ -3,6 +3,8 @@ package classes;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import DAO.ProjetoDAO;
+
 public class Projeto {
     private int id;
     private String nome;
@@ -32,6 +34,12 @@ public class Projeto {
         this.arrecadacao = arrecadacao;
         this.imagem = imagem;
         this.dataCriacao = dataCriacao;
+    }
+    
+    public BigDecimal totalArrecadado(int meses) {
+    	BigDecimal total_arrecadado = ProjetoDAO.calculaTotalArrecadado(this, meses);
+    	
+    	return total_arrecadado;
     }
     
 

@@ -1,6 +1,8 @@
 package DAO;
 
 import classes.*;
+
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -118,5 +120,23 @@ public class ProjetoDAO {
         } catch (SQLException e) {
             System.err.println("Erro 500: Erro ao deletar projeto: " + e.getMessage());
         }
+    }
+    
+    //Requisito 8
+    public static BigDecimal calculaTotalArrecadado(Projeto proj, int meses) {
+        String sql = "SELECT SUM(valor) FROM doacao WHERE id_projeto = ? AND data_criacao BETWEEN DATE_SUB(NOW(), INTERVAL ? MONTH) AND NOW()";
+        try (Connection conexao = Conexao.conectar(); 
+             PreparedStatement index = conexao.prepareStatement(sql)) {
+        	index.setInt(1, proj.getId());
+        	index.setInt(2, meses);
+            try (ResultSet resultado = index.executeQuery()) {
+                if (resultado.next()) {
+                    return resultado.getBigDecimal(1) != null ? resultado	.getBigDecimal(1) : BigDecimal.ZERO;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro 500: Erro ao calcular total arrecadado: " + e.getMessage());
+        }
+        return BigDecimal.ZERO;
     }
 }

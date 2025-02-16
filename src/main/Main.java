@@ -13,7 +13,7 @@ import DAO.*;
 public class Main {
 
 	public static void main(String[] args) {
-	/*	Projeto proj = new Projeto();
+	/*	
 		
 		proj.setNome("Fisk");
 		proj.setDescricao("A non fundable company");
@@ -27,13 +27,13 @@ public class Main {
 		*/
 		
 		Projeto proj = new Projeto();
+		
 		proj = ProjetoDAO.consultarProjeto(2);
 		
-		proj.setArrecadacao(new BigDecimal(3000000000.00));
+		BigDecimal total = proj.totalArrecadado(4);
+		System.out.println(total);
 		
-		ProjetoDAO.atualizarProjeto(proj);
 		
-	
 
 
 

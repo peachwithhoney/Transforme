@@ -1,9 +1,9 @@
 package DAO;
 
-import java.sql.*;
+import classes.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import classes.*;
+import java.sql.*;
 
 public class UsuarioDAO {
 
@@ -93,15 +93,16 @@ public class UsuarioDAO {
 
     
     public static Usuario autenticarUsuario(String email, String senha) {
-        String sql = "SELECT * FROM usuario WHERE email = ?";
+        String sql = "SELECT * FROM usuario WHERE email = ?";  
         try (Connection conexao = Conexao.conectar(); 
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
-            stmt.setString(1, email);
-            ResultSet rs = stmt.executeQuery();
+            stmt.setString(1, email);  
+            ResultSet rs = stmt.executeQuery(); 
 
             if (rs.next()) {
                 String senhaHash = rs.getString("senha");
+
                 if (senhaHash.equals(hashSenha(senha))) {
                     Usuario usuario = new Usuario(
                         rs.getInt("id"),
@@ -109,14 +110,14 @@ public class UsuarioDAO {
                         email,
                         senhaHash
                     );
-                    usuario.setLogado(true);
-                    return usuario;
+                    usuario.setLogado(true);  
+                    return usuario; 
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao autenticar usuário: " + e.getMessage(), e);
+            throw new RuntimeException("Erro ao autenticar usuário: " + e.getMessage(), e);  
         }
-        return null;
+        return null;  
     }
 
     

@@ -7,17 +7,17 @@ public class Usuario {
     private String nome;
     private String email;
     private String senha;
-    
     private boolean logado;
 
-    
     public Usuario() {
+        this.logado = false;  
     }
     
     public Usuario(String nome, String email, String senha) {
         this.nome = nome;
         this.email = email;
         this.senha = senha;
+        this.logado = false;  
     }
 
     public Usuario(int id, String nome, String email, String senha) {
@@ -25,30 +25,34 @@ public class Usuario {
         this.nome = nome;
         this.email = email;
         this.senha = senha;
-        this.logado = false;
+        this.logado = false;  
     }
     
     
- // ##### Requisito 2 - 10/02/2024 #####
-    public static Usuario loginUsuario(String email,String senha) {
-        Usuario temp_user = new Usuario();
-        temp_user.setEmail(email);
-        temp_user.setSenha(senha);
+    public static Usuario loginUsuario(String email, String senha) {
+        Usuario tempUser = new Usuario();
+        tempUser.setEmail(email);
+        tempUser.setSenha(senha);
+
+        Usuario usuarioAutenticado = UsuarioDAO.autenticarUsuario(tempUser);
+
+        if (usuarioAutenticado != null) {
+            usuarioAutenticado.setLogado(true);
+        }
         
-        return UsuarioDAO.autenticarUsuario(temp_user);
+        return UsuarioDAO.autenticarUsuario(email, senha);
     }
-    
-    // ##### Requisito 2 - 10/02/2024 #####
+
     public static void logoutUsuario(Usuario usuario) {
-        if (usuario != null) {
-            usuario.setLogado(false); // Marca o usuário como "não logado"
+        if (usuario != null && usuario.isLogado()) {
+            usuario.setLogado(false);  
             System.out.println("Usuário deslogado com sucesso!");
         } else {
             System.out.println("Nenhum usuário está logado.");
         }
     }
 
-   
+    
     public int getId() {
         return id;
     }
@@ -80,7 +84,7 @@ public class Usuario {
     public void setSenha(String senha) {
         this.senha = senha;
     }
-    
+
     public boolean isLogado() {
         return logado;
     }
@@ -91,6 +95,6 @@ public class Usuario {
 
     @Override
     public String toString() {
-        return "Informacoes do usuario:\nid: " + id + "\nnome: " + nome + "\nemail: " + email;
+        return "Informações do usuário:\nid: " + id + "\nnome: " + nome + "\nemail: " + email;
     }
 }

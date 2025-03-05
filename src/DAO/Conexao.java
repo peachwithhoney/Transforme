@@ -13,19 +13,16 @@ public class Conexao {
         try {
             return DriverManager.getConnection(URL, USUARIO, SENHA);
         } catch (SQLException e) {
-            System.err.println("Erro ao conectar ao banco de dados: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Erro ao conectar ao banco de dados", e);
         }
     }
 
-    public static void main(String[] args) {
-        Connection conexao = conectar();
+    public static void fecharConexao(Connection conexao) {
         if (conexao != null) {
-            System.out.println("Conexão bem-sucedida!");
             try {
                 conexao.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                System.err.println("Erro ao fechar conexão: " + e.getMessage());
             }
         }
     }

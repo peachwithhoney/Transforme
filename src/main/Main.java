@@ -26,12 +26,15 @@ public class Main {
 	
 		*/
 		
-		Projeto proj = new Projeto();
 		
-		proj = ProjetoDAO.consultarProjeto(2);
 		
-		BigDecimal total = proj.totalArrecadado(4);
-		System.out.println(total);
+		Usuario u = new Usuario();
+		
+		u.setNome("teste1");
+		u.setEmail("teste@gmail.com");
+		u.setSenha("teste");
+		
+		UsuarioDAO.inserirUsuario(u);
 		
 		
 

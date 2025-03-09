@@ -61,26 +61,27 @@ public class ProjetoDAO {
     
     public static List<Projeto> listaProjeto() {
         List<Projeto> listaProjetos = new ArrayList<>();
-        String sql = "SELECT * FROM projeto";
+        String sql = "SELECT id, nome, descricao, arrecadacao FROM projeto";
         try (Connection conexao = Conexao.conectar();
              Statement stmt = conexao.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                listaProjetos.add(new Projeto(
-                    rs.getInt("id"),
-                    rs.getString("nome"),
-                    rs.getString("descricao"),
-                    rs.getBigDecimal("meta_financeira"),
-                    rs.getBigDecimal("arrecadacao"),
-                    rs.getString("imagem"),
-                    rs.getTimestamp("data_criacao")
-                ));
+                int id = rs.getInt("id");
+                String nome = rs.getString("nome");
+                String descricao = rs.getString("descricao");
+                BigDecimal arrecadacao = rs.getBigDecimal("arrecadacao");
+                
+                listaProjetos.add(new Projeto(id,nome,descricao,null,arrecadacao,null,null));
+                
             }
         } catch (SQLException e) {
             System.err.println("Erro 500: Erro ao listar projetos: " + e.getMessage());
         }
         return listaProjetos;
     }
+
+
+
     
     public static void atualizarProjeto(Projeto projeto) {
         String sql = "UPDATE projeto SET nome = ?, descricao = ?, meta_financeira = ?, arrecadacao = ?, imagem = ?, data_criacao = ? WHERE id = ?";

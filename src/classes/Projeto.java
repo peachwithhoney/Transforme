@@ -47,6 +47,15 @@ public class Projeto {
     	return total_arrecadado;
     }
     
+    public String metaFinanceira() {
+    	String status;
+    	
+    	
+    	status = ("Projeto " + this.getNome() + "\nTotal Arrecadado/Meta\n" + this.getArrecadacao() +" / " + this.getMetaFinanceira());
+    	
+    	return status;
+    }
+    
 
     public int getId() {
         return id;

@@ -1,9 +1,15 @@
 package DAO;
 
 import classes.*;
+
+import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.*;
+
+
 
 public class UsuarioDAO {
 
@@ -133,4 +139,60 @@ public class UsuarioDAO {
             throw new RuntimeException("Erro ao criptografar senha", e);
         }
     }
+    
+    public static boolean realizarDoacao(Usuario usuario, Projeto projeto, BigDecimal valor) {
+        String sql = "INSERT INTO doacao (id_usuario, id_projeto, valor, data) VALUES (?, ?, ?, ?)";
+        
+        try (Connection conexao = Conexao.conectar();
+             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+
+            stmt.setInt(1, usuario.getId());
+            stmt.setInt(2, projeto.getId());
+            stmt.setBigDecimal(3, valor);
+            stmt.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
+
+            int linhas = stmt.executeUpdate();
+            return linhas > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Erro 500: Falha ao realizar doação - " + e.getMessage());
+            return false;
+        }
+    }
+
+    public static List<String> listaDoacoes(int idProjeto) {
+        List<String> listaDoacoes = new ArrayList<>();
+        String sql = "SELECT u.nome AS usuario, u.email, d.valor, d.data, p.nome AS projeto " +
+                     "FROM doacao d " +
+                     "JOIN Usuario u ON d.id_usuario = u.id " +
+                     "JOIN projeto p ON d.id_projeto = p.id " +
+                     "WHERE p.id = ?";
+
+        try (Connection conexao = Conexao.conectar();
+             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+
+            stmt.setInt(1, idProjeto);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                String nomeUsuario = rs.getString("usuario");
+                String email = rs.getString("email");
+                BigDecimal valor = rs.getBigDecimal("valor");
+                Timestamp data = rs.getTimestamp("data");
+                String nomeProjeto = rs.getString("projeto");
+
+                String doacaoInfo = String.format(
+                    "%s | %s | R$ %.2f | %s | %s",
+                    nomeUsuario, email, valor, data, nomeProjeto
+                );
+
+                System.out.println(doacaoInfo);
+                listaDoacoes.add(doacaoInfo);
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro 500: Erro ao listar doações - " + e.getMessage());
+        }
+        return listaDoacoes;
+    }
 }
+

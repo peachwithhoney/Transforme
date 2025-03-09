@@ -13,21 +13,20 @@ import DAO.*;
 public class Main {
 
 	public static void main(String[] args) {
-	/*	
+	
+		Projeto proj = new Projeto();
 		
 		proj.setNome("Fisk");
 		proj.setDescricao("A non fundable company");
 		proj.setMetaFinanceira(new BigDecimal(25000000.00));
 		proj.setArrecadacao(new BigDecimal(00));
-		proj.setImagem("20231019_195057_2");
 		proj.setDataCriacao(new Date(13, 2, 2023));
 		ProjetoDAO.inserirProjeto(proj);
 	
 	
-		*/
 		
 		
-		
+		/*
 		Usuario u = new Usuario();
 		
 		u.setNome("teste1");
@@ -37,7 +36,13 @@ public class Main {
 		UsuarioDAO.inserirUsuario(u);
 		
 		
-
+		Usuario u = new Usuario();
+		
+		u = UsuarioDAO.consultarUsuario(2);
+		
+		
+		UsuarioDAO.deletarUsuario(2);
+		*/
 
 
 	}

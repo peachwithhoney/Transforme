@@ -55,7 +55,7 @@ public class UsuarioDAO {
 
             stmt.setString(1, usuario.getNome());
             stmt.setString(2, usuario.getEmail());
-            stmt.setString(3, hashSenha(usuario.getSenha()));
+            stmt.setString(3, usuario.getSenha());
             stmt.setInt(4, usuario.getId());
 
             int index = stmt.executeUpdate();

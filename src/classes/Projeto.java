@@ -16,6 +16,13 @@ public class Projeto {
     public Projeto() {
     }
 
+    public Projeto(int id, String nome, String descricao, BigDecimal metaFinanceira, Date dataCriacao) {
+        this.nome = nome;
+        this.descricao = descricao;
+        this.metaFinanceira = metaFinanceira;
+        this.dataCriacao = dataCriacao;
+    }
+    
     public Projeto(int id, String nome, String descricao, BigDecimal metaFinanceira, String imagem, Date dataCriacao) {
         this.nome = nome;
         this.descricao = descricao;

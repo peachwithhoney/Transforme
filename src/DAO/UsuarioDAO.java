@@ -179,7 +179,7 @@ public class UsuarioDAO {
     }
 
 
-    public static List<String> listaDoacoes(int idProjeto) {
+    public static List<String> listaDoacoesProjeto(int idProjeto) {
         List<String> listaDoacoes = new ArrayList<>();
         String sql = "SELECT u.nome AS usuario, u.email, d.valor, d.data, p.nome AS projeto " +
                      "FROM doacao d " +
@@ -191,6 +191,41 @@ public class UsuarioDAO {
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setInt(1, idProjeto);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                String nomeUsuario = rs.getString("usuario");
+                String email = rs.getString("email");
+                BigDecimal valor = rs.getBigDecimal("valor");
+                Timestamp data = rs.getTimestamp("data");
+                String nomeProjeto = rs.getString("projeto");
+
+                String doacaoInfo = String.format(
+                    "%s | %s | R$ %.2f | %s | %s",
+                    nomeUsuario, email, valor, data, nomeProjeto
+                );
+
+                System.out.println(doacaoInfo);
+                listaDoacoes.add(doacaoInfo);
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro 500: Erro ao listar doações - " + e.getMessage());
+        }
+        return listaDoacoes;
+    }
+    
+    public static List<String> listaDoacoesUsuario(int idUsuario) {
+        List<String> listaDoacoes = new ArrayList<>();
+        String sql = "SELECT u.nome AS usuario, u.email, d.valor, d.data, p.nome AS projeto " +
+                     "FROM doacao d " +
+                     "JOIN Usuario u ON d.id_usuario = u.id " +
+                     "JOIN projeto p ON d.id_projeto = p.id " +
+                     "WHERE u.id = ?";
+
+        try (Connection conexao = Conexao.conectar();
+             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+
+            stmt.setInt(1, idUsuario);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {

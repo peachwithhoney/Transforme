@@ -30,18 +30,14 @@ public class Usuario {
     
     
     public static Usuario loginUsuario(String email, String senha) {
-        Usuario tempUser = new Usuario();
-        tempUser.setEmail(email);
-        tempUser.setSenha(senha);
+        Usuario usuarioAutenticado = UsuarioDAO.autenticarUsuario(email, senha);
 
-        Usuario usuarioAutenticado = UsuarioDAO.autenticarUsuario(tempUser);
-
-        if (usuarioAutenticado != null) {
-            usuarioAutenticado.setLogado(true);
-        }
-        
-        return UsuarioDAO.autenticarUsuario(email, senha);
+    if (usuarioAutenticado != null) {
+        usuarioAutenticado.setLogado(true);
     }
+
+    return usuarioAutenticado; 
+}
 
     public static void logoutUsuario(Usuario usuario) {
         if (usuario != null && usuario.isLogado()) {

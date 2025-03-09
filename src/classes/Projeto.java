@@ -1,9 +1,8 @@
 package classes;
 
+import DAO.ProjetoDAO;
 import java.math.BigDecimal;
 import java.util.Date;
-
-import DAO.ProjetoDAO;
 
 public class Projeto {
     private int id;
@@ -21,7 +20,6 @@ public class Projeto {
         this.nome = nome;
         this.descricao = descricao;
         this.metaFinanceira = metaFinanceira;
-        this.arrecadacao = arrecadacao;
         this.imagem = imagem;
         this.dataCriacao = dataCriacao;
     }

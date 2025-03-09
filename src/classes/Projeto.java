@@ -51,7 +51,7 @@ public class Projeto {
     	String status;
     	
     	
-    	status = ("Projeto " + this.getNome() + "\nTotal Arrecadado/Meta\n" + this.getArrecadacao() +" / " + this.getMetaFinanceira());
+    	status = ("Projeto " + this.getNome() + "\nTotal Arrecadado/Meta\nR$" + this.getArrecadacao() +" / R$" + this.getMetaFinanceira());
     	
     	return status;
     }

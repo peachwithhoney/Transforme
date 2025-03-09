@@ -141,24 +141,43 @@ public class UsuarioDAO {
     }
     
     public static boolean realizarDoacao(Usuario usuario, Projeto projeto, BigDecimal valor) {
-        String sql = "INSERT INTO doacao (id_usuario, id_projeto, valor, data) VALUES (?, ?, ?, ?)";
+        String sqlDoacao = "INSERT INTO doacao (id_usuario, id_projeto, valor, data) VALUES (?, ?, ?, ?)";
+        String sqlAtualizacaoProjeto = "UPDATE projeto SET arrecadacao = arrecadacao + ? WHERE id = ?";
         
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try (Connection conexao = Conexao.conectar()) {
+            conexao.setAutoCommit(false);
 
-            stmt.setInt(1, usuario.getId());
-            stmt.setInt(2, projeto.getId());
-            stmt.setBigDecimal(3, valor);
-            stmt.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
+            try (PreparedStatement stmtDoacao = conexao.prepareStatement(sqlDoacao);
+                 PreparedStatement stmtAtualizacaoProjeto = conexao.prepareStatement(sqlAtualizacaoProjeto)) {
 
-            int linhas = stmt.executeUpdate();
-            return linhas > 0;
+                stmtDoacao.setInt(1, usuario.getId());
+                stmtDoacao.setInt(2, projeto.getId());
+                stmtDoacao.setBigDecimal(3, valor);
+                stmtDoacao.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
+                int linhasDoacao = stmtDoacao.executeUpdate();
 
+                stmtAtualizacaoProjeto.setBigDecimal(1, valor);
+                stmtAtualizacaoProjeto.setInt(2, projeto.getId());
+                int linhasProjeto = stmtAtualizacaoProjeto.executeUpdate();
+
+                if (linhasDoacao > 0 && linhasProjeto > 0) {
+                    conexao.commit();
+                    return true;
+                } else {
+                    conexao.rollback();
+                    return false;
+                }
+            } catch (SQLException e) {
+                conexao.rollback();
+                System.err.println("Erro 500: Falha ao realizar doação e atualizar arrecadação - " + e.getMessage());
+                return false;
+            }
         } catch (SQLException e) {
-            System.err.println("Erro 500: Falha ao realizar doação - " + e.getMessage());
+            System.err.println("Erro 500: Falha na conexão ou transação - " + e.getMessage());
             return false;
         }
     }
+
 
     public static List<String> listaDoacoes(int idProjeto) {
         List<String> listaDoacoes = new ArrayList<>();

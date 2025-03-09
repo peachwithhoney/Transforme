@@ -15,19 +15,23 @@ public class Main {
 
 	public static void main(String[] args) {
 			
+		Usuario u = new Usuario();
+		u = UsuarioDAO.consultarUsuario(1);
+		
 		Projeto proj = new Projeto();
 		proj = ProjetoDAO.consultarProjeto(2);
+	
 		
 		System.out.println(proj.metaFinanceira());
 		
 		/*
-		Usuario u = new Usuario();
+		
 		Projeto proj = new Projeto();
 		
-		u = UsuarioDAO.consultarUsuario(1);
+		
 		proj = ProjetoDAO.consultarProjeto(2);
 		
-		UsuarioDAO.realizarDoacao(u, proj, new BigDecimal(10000));
+		
 		
 		
 		proj.setNome("Teste3");

@@ -1,29 +1,28 @@
 package main;
 
-import classes.*;
-
-
-import java.math.BigDecimal;
-import java.sql.Date;
-import java.time.LocalDate;
-import java.util.*;
-
-import DAO.*;
+import javax.swing.SwingUtilities;
+import view.*;
 
 
 public class Main {
 
 	public static void main(String[] args) {
 			
-		Usuario u = new Usuario();
-		u = UsuarioDAO.consultarUsuario(1);
+		// Usuario u = new Usuario();
+		// u = UsuarioDAO.consultarUsuario(1);
 		
-		Projeto proj = new Projeto();
-		proj = ProjetoDAO.consultarProjeto(2);
+		//Projeto proj = new Projeto();
+		// proj = ProjetoDAO.consultarProjeto(2);
 	
 		
-		System.out.println(proj.metaFinanceira());
+		// System.out.println(proj.metaFinanceira());
 		
+		SwingUtilities.invokeLater(() -> {
+        	LoginScreen loginScreen = new LoginScreen();
+            loginScreen.setVisible(true); 
+        });
+
+
 		/*
 		
 		Projeto proj = new Projeto();

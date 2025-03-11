@@ -4,8 +4,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.*;
-import view.popups.PopupCadastrarUsuarios; 
-import view.popups.PopupCadastroProjetos; 
+import view.popups.*;
 
 public class ProjetosScreen extends JFrame {
 

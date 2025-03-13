@@ -1,7 +1,6 @@
 package DAO;
 
 import classes.*;
-
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
@@ -80,9 +79,55 @@ public class ProjetoDAO {
         return listaProjetos;
     }
 
+    public static List<Projeto> filtrarProjetos(String nome, String descricao, String meta) {
+        List<Projeto> listaProjetos = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT id, nome, descricao, meta_financeira, arrecadacao FROM projeto WHERE 1=1");
+
+        if (nome != null && !nome.isEmpty()) {
+            sql.append(" AND nome LIKE ?");
+        }
+        if (descricao != null && !descricao.isEmpty()) {
+            sql.append(" AND descricao LIKE ?");
+        }
+        if (meta != null && !meta.isEmpty()) {
+            sql.append(" AND meta_financeira >= ?");
+        }
+
+        try (Connection conexao = Conexao.conectar();
+             PreparedStatement stmt = conexao.prepareStatement(sql.toString())) {
+
+            int index = 1;
+
+            if (nome != null && !nome.isEmpty()) {
+                stmt.setString(index++, "%" + nome + "%");
+            }
+            if (descricao != null && !descricao.isEmpty()) {
+                stmt.setString(index++, "%" + descricao + "%");
+            }
+            if (meta != null && !meta.isEmpty()) {
+                stmt.setBigDecimal(index++, new BigDecimal(meta));
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+                    String nomeProjeto = rs.getString("nome");
+                    String descricaoProjeto = rs.getString("descricao");
+                    BigDecimal metaFinanceira = rs.getBigDecimal("meta_financeira");
+                    BigDecimal arrecadacao = rs.getBigDecimal("arrecadacao");
+
+                    listaProjetos.add(new Projeto(id, nomeProjeto, descricaoProjeto, metaFinanceira, arrecadacao, null, null));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro 500: Erro ao filtrar projetos: " + e.getMessage());
+        }
+
+        return listaProjetos;
+    }
 
 
-    
+
     public static void atualizarProjeto(Projeto projeto) {
         String sql = "UPDATE projeto SET nome = ?, descricao = ?, meta_financeira = ?, arrecadacao = ?, imagem = ?, data_criacao = ? WHERE id = ?";
         try (Connection conexao = Conexao.conectar(); 

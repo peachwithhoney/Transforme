@@ -1,12 +1,19 @@
 package view.popups;
 
+import DAO.ProjetoDAO;
+import classes.Projeto;
 import java.awt.*;
+import java.math.BigDecimal;
 import javax.swing.*;
+import view.ProjetosScreen;
 
 public class PopupCadastroProjetos extends JDialog {
 
-    public PopupCadastroProjetos(JFrame parent) {
+    private ProjetosScreen projetosScreen; 
+
+    public PopupCadastroProjetos(ProjetosScreen parent) {
         super(parent, "Cadastrar Projeto", true); 
+        this.projetosScreen = parent; 
         setSize(400, 300);
         setLocationRelativeTo(parent);
         setLayout(new BorderLayout());
@@ -58,8 +65,43 @@ public class PopupCadastroProjetos extends JDialog {
 
         // Ação do botão "Salvar"
         salvarButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Salvo com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-            dispose(); 
+            // Validação dos campos
+            String nome = nomeField.getText().trim();
+            String descricao = descricaoField.getText().trim();
+            String metaStr = metaField.getText().trim();
+
+            if (nome.isEmpty() || descricao.isEmpty() || metaStr.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Preencha todos os campos!", "Erro", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            try {
+                // Converte a meta financeira para BigDecimal
+                BigDecimal metaFinanceira = new BigDecimal(metaStr);
+
+                // Criar um novo projeto
+                Projeto projeto = new Projeto();
+                projeto.setNome(nome);
+                projeto.setDescricao(descricao);
+                projeto.setMetaFinanceira(metaFinanceira);
+                projeto.setArrecadacao(BigDecimal.ZERO); 
+
+                // Insere o projeto no banco de dados
+                ProjetoDAO.inserirProjeto(projeto);
+
+                // Mensagem de sucesso
+                JOptionPane.showMessageDialog(this, "Projeto salvo com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+
+                
+                dispose();
+
+                // Atualiza a lista de projetos na tela de projetos
+                projetosScreen.atualizarListaProjetos(ProjetoDAO.listaProjeto());
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Meta financeira inválida! Use números.", "Erro", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Erro ao salvar projeto: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         popupPanel.add(salvarButton);

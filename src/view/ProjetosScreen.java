@@ -1,10 +1,14 @@
 package view;
 
-import java.awt.*; 
+import DAO.ProjetoDAO;
+import classes.Projeto;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 import javax.swing.*;
-import view.popups.*;
+import view.popups.PopupCadastrarUsuarios;
+import view.popups.PopupCadastroProjetos;
 
 public class ProjetosScreen extends JFrame {
 
@@ -121,6 +125,13 @@ public class ProjetosScreen extends JFrame {
 
         JPopupMenu logoutMenu = new JPopupMenu();
         JMenuItem logoutItem = new JMenuItem("Logout");
+        logoutItem.addActionListener(e -> {
+            // Fecha a tela de projetos
+            dispose();
+            // Abre a tela de login
+            LoginScreen loginScreen = new LoginScreen();
+            loginScreen.setVisible(true);
+        });
         logoutMenu.add(logoutItem);
 
         usuarioLabel.addMouseListener(new MouseAdapter() {
@@ -134,7 +145,8 @@ public class ProjetosScreen extends JFrame {
 
         return headerPanel;
     }
-    
+
+    // Método para criar o painel de filtros
     private JPanel criarBalaoFiltros() {
         JPanel filtrosPanel = new JPanel();
         filtrosPanel.setLayout(new BoxLayout(filtrosPanel, BoxLayout.Y_AXIS));
@@ -168,7 +180,26 @@ public class ProjetosScreen extends JFrame {
         botoesPanel.setBackground(new Color(240, 240, 240));
 
         JButton filtrarButton = new JButton("Filtrar");
+        filtrarButton.addActionListener(e -> {
+            // Lógica para filtrar projetos
+            String nome = nomeField.getText();
+            String descricao = descricaoField.getText();
+            String meta = metaField.getText();
+
+            // Chama o método de filtro no DAO 
+            List<Projeto> projetosFiltrados = ProjetoDAO.filtrarProjetos(nome, descricao, meta);
+            atualizarListaProjetos(projetosFiltrados);
+        });
+
         JButton limparButton = new JButton("Limpar Filtros");
+        limparButton.addActionListener(e -> {
+            nomeField.setText("");
+            descricaoField.setText("");
+            metaField.setText("");
+            // Recarrega a lista completa de projetos
+            atualizarListaProjetos(ProjetoDAO.listaProjeto());
+        });
+
         botoesPanel.add(filtrarButton);
         botoesPanel.add(limparButton);
 
@@ -176,6 +207,7 @@ public class ProjetosScreen extends JFrame {
         return filtrosPanel;
     }
 
+    // Método para criar o painel de projetos
     private JPanel criarBalaoProjetos() {
         JPanel projetosPanel = new JPanel();
         projetosPanel.setLayout(new BoxLayout(projetosPanel, BoxLayout.Y_AXIS));
@@ -188,14 +220,18 @@ public class ProjetosScreen extends JFrame {
         projetosPanel.add(tituloLabel);
         projetosPanel.add(Box.createVerticalStrut(10));
 
-        projetosPanel.add(criarProjetoPanel("Projeto 1", "Descrição 1", "5000"));
-        projetosPanel.add(Box.createVerticalStrut(10));
-        projetosPanel.add(criarProjetoPanel("Projeto 2", "Descrição 2", "12000"));
+        // Carrega a lista de projetos do banco de dados
+        List<Projeto> projetos = ProjetoDAO.listaProjeto();
+        for (Projeto projeto : projetos) {
+            projetosPanel.add(criarProjetoPanel(projeto));
+            projetosPanel.add(Box.createVerticalStrut(10));
+        }
 
         return projetosPanel;
     }
 
-    private JPanel criarProjetoPanel(String nome, String descricao, String meta) {
+    // Método para criar um painel de projeto individual
+    private JPanel criarProjetoPanel(Projeto projeto) {
         JPanel projetoPanel = new JPanel(new BorderLayout());
         projetoPanel.setBackground(Color.WHITE);
         projetoPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
@@ -203,18 +239,64 @@ public class ProjetosScreen extends JFrame {
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.setBackground(Color.WHITE);
-        infoPanel.add(new JLabel(nome));
-        infoPanel.add(new JLabel(descricao));
-        infoPanel.add(new JLabel("Meta: R$ " + meta));
+        infoPanel.add(new JLabel(projeto.getNome()));
+        infoPanel.add(new JLabel(projeto.getDescricao()));
+        infoPanel.add(new JLabel("Meta: R$ " + projeto.getMetaFinanceira()));
         projetoPanel.add(infoPanel, BorderLayout.CENTER);
 
         JPanel acoesPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         acoesPanel.setBackground(Color.WHITE);
-        acoesPanel.add(new JButton("Alterar"));
-        acoesPanel.add(new JButton("Excluir"));
+
+        JButton alterarButton = new JButton("Alterar");
+        JButton excluirButton = new JButton("Excluir");
+
+        // Ação do botão "Excluir"
+        excluirButton.addActionListener(e -> {
+            int confirmacao = JOptionPane.showConfirmDialog(
+                this,
+                "Tem certeza que deseja excluir o projeto " + projeto.getNome() + "?",
+                "Confirmar Exclusão",
+                JOptionPane.YES_NO_OPTION
+            );
+
+            if (confirmacao == JOptionPane.YES_OPTION) {
+                // Exclui o projeto do banco de dados
+                ProjetoDAO.deletarProjeto(projeto.getId());
+                // Atualiza a lista de projetos
+                atualizarListaProjetos(ProjetoDAO.listaProjeto());
+                JOptionPane.showMessageDialog(this, "Projeto excluído com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
+        acoesPanel.add(alterarButton);
+        acoesPanel.add(excluirButton);
         projetoPanel.add(acoesPanel, BorderLayout.EAST);
 
         return projetoPanel;
+    }
+
+    // Método para atualizar a lista de projetos exibida
+    public void atualizarListaProjetos(List<Projeto> projetos) {
+        JPanel centerPanel = (JPanel) getContentPane().getComponent(1);
+        centerPanel.removeAll();
+
+        JPanel filtrosPanel = criarBalaoFiltros();
+        centerPanel.add(filtrosPanel);
+        centerPanel.add(Box.createVerticalStrut(20));
+
+        JPanel projetosPanel = new JPanel();
+        projetosPanel.setLayout(new BoxLayout(projetosPanel, BoxLayout.Y_AXIS));
+        projetosPanel.setBackground(new Color(240, 240, 240));
+        projetosPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        for (Projeto projeto : projetos) {
+            projetosPanel.add(criarProjetoPanel(projeto));
+            projetosPanel.add(Box.createVerticalStrut(10));
+        }
+
+        centerPanel.add(projetosPanel);
+        centerPanel.revalidate();
+        centerPanel.repaint();
     }
 
     public static void main(String[] args) {

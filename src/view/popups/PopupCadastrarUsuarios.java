@@ -3,6 +3,8 @@ package view.popups;
 import java.awt.*;
 import java.util.Arrays;
 import javax.swing.*;
+import DAO.UsuarioDAO;
+import classes.Usuario;
 
 public class PopupCadastrarUsuarios extends JDialog {
 
@@ -27,10 +29,10 @@ public class PopupCadastrarUsuarios extends JDialog {
         popupPanel.add(nomeField);
         popupPanel.add(Box.createVerticalStrut(10));
 
-        addField(popupPanel, "Usuário:");
-        JTextField usuarioField = new JTextField(20);
-        usuarioField.setMaximumSize(FIELD_SIZE);
-        popupPanel.add(usuarioField);
+        addField(popupPanel, "Email:");
+        JTextField emailField = new JTextField(20);
+        emailField.setMaximumSize(FIELD_SIZE);
+        popupPanel.add(emailField);
         popupPanel.add(Box.createVerticalStrut(10));
 
         addField(popupPanel, "Senha:");
@@ -50,11 +52,11 @@ public class PopupCadastrarUsuarios extends JDialog {
 
         cadastrarButton.addActionListener(e -> {
             String nome = nomeField.getText().trim();
-            String usuario = usuarioField.getText().trim();
+            String email = emailField.getText().trim();
             char[] senha = senhaField.getPassword();
             char[] confirmarSenha = confirmarSenhaField.getPassword();
 
-            if (nome.isEmpty() || usuario.isEmpty() || senha.length == 0 || confirmarSenha.length == 0) {
+            if (nome.isEmpty() || email.isEmpty() || senha.length == 0 || confirmarSenha.length == 0) {
                 JOptionPane.showMessageDialog(this, "Todos os campos são obrigatórios!", "Erro", JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -64,32 +66,8 @@ public class PopupCadastrarUsuarios extends JDialog {
                 return;
             }
 
-            JOptionPane.showMessageDialog(this, "Usuário cadastrado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-            dispose();
-        });
-
-        cancelarButton.addActionListener(e -> dispose());
-
-        popupPanel.add(cadastrarButton);
-        popupPanel.add(Box.createVerticalStrut(10));
-        popupPanel.add(cancelarButton);
-
-        add(popupPanel, BorderLayout.CENTER);
-    }
-
-    private void addField(JPanel panel, String labelText) {
-        JLabel label = new JLabel(labelText);
-        label.setAlignmentX(Component.LEFT_ALIGNMENT);
-        panel.add(label);
-    }
-
-    private JButton createButton(String text, Color backgroundColor) {
-        JButton button = new JButton(text);
-        button.setBackground(backgroundColor);
-        button.setForeground(Color.WHITE);
-        button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        button.setFocusPainted(false);
-        button.setPreferredSize(new Dimension(100, 30));
-        return button;
-    }
-}
+            // Cria um novo usuário
+            Usuario usuario = new Usuario();
+            usuario.setNome(nome);
+            usuario.setEmail(email);
+            usuario.set

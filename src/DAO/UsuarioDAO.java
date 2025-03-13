@@ -1,30 +1,28 @@
 package DAO;
 
 import classes.*;
-
 import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.util.*;
-
-
+import java.util.ArrayList;
+import java.util.List;
 
 public class UsuarioDAO {
 
-    
+    // Método para inserir um novo usuário
     public static void inserirUsuario(Usuario usuario) {
         String sql = "INSERT INTO usuario (nome, email, senha) VALUES (?, ?, ?)";
-        try (Connection conexao = Conexao.conectar(); 
+        try (Connection conexao = Conexao.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setString(1, usuario.getNome());
             stmt.setString(2, usuario.getEmail());
             stmt.setString(3, usuario.getSenha());
 
-            int index = stmt.executeUpdate();
-            if (index > 0) {
+            int linhasAfetadas = stmt.executeUpdate();
+            if (linhasAfetadas > 0) {
                 System.out.println("Usuário inserido com sucesso!");
             } else {
                 System.out.println("Falha ao inserir usuário.");
@@ -34,16 +32,16 @@ public class UsuarioDAO {
         }
     }
 
-    
+    // Método para deletar um usuário
     public static void deletarUsuario(int id) {
         String sql = "DELETE FROM usuario WHERE id = ?";
-        try (Connection conexao = Conexao.conectar(); 
+        try (Connection conexao = Conexao.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
-            int index = stmt.executeUpdate();
+            int linhasAfetadas = stmt.executeUpdate();
 
-            if (index > 0) {
+            if (linhasAfetadas > 0) {
                 System.out.println("Usuário deletado com sucesso!");
             } else {
                 System.out.println("Usuário não encontrado.");
@@ -53,10 +51,10 @@ public class UsuarioDAO {
         }
     }
 
-    
+    // Método para atualizar um usuário
     public static void atualizarUsuario(Usuario usuario) {
         String sql = "UPDATE usuario SET nome = ?, email = ?, senha = ? WHERE id = ?";
-        try (Connection conexao = Conexao.conectar(); 
+        try (Connection conexao = Conexao.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setString(1, usuario.getNome());
@@ -64,8 +62,8 @@ public class UsuarioDAO {
             stmt.setString(3, usuario.getSenha());
             stmt.setInt(4, usuario.getId());
 
-            int index = stmt.executeUpdate();
-            if (index > 0) {
+            int linhasAfetadas = stmt.executeUpdate();
+            if (linhasAfetadas > 0) {
                 System.out.println("Usuário atualizado com sucesso!");
             } else {
                 System.out.println("Usuário não encontrado.");
@@ -75,9 +73,10 @@ public class UsuarioDAO {
         }
     }
 
+    // Método para consultar um usuário por ID
     public static Usuario consultarUsuario(int id) {
         String sql = "SELECT * FROM usuario WHERE id = ?";
-        try (Connection conexao = Conexao.conectar(); 
+        try (Connection conexao = Conexao.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
@@ -85,7 +84,7 @@ public class UsuarioDAO {
 
             if (rs.next()) {
                 return new Usuario(
-                    id,
+                    rs.getInt("id"),
                     rs.getString("nome"),
                     rs.getString("email"),
                     rs.getString("senha")
@@ -97,10 +96,10 @@ public class UsuarioDAO {
         return null;
     }
 
-    
+    // Método para autenticar um usuário
     public static Usuario autenticarUsuario(String email, String senha) {
         String sql = "SELECT * FROM usuario WHERE email = ?";
-        try (Connection conexao = Conexao.conectar(); 
+        try (Connection conexao = Conexao.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setString(1, email);
@@ -109,14 +108,12 @@ public class UsuarioDAO {
             if (rs.next()) {
                 String senhaHash = rs.getString("senha");
                 if (senhaHash.equals(hashSenha(senha))) {
-                    Usuario usuario = new Usuario(
+                    return new Usuario(
                         rs.getInt("id"),
                         rs.getString("nome"),
                         email,
                         senhaHash
                     );
-                    usuario.setLogado(true);
-                    return usuario;
                 }
             }
         } catch (SQLException e) {
@@ -125,7 +122,7 @@ public class UsuarioDAO {
         return null;
     }
 
-    
+    // Método para criptografar a senha
     private static String hashSenha(String senha) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -139,11 +136,73 @@ public class UsuarioDAO {
             throw new RuntimeException("Erro ao criptografar senha", e);
         }
     }
-    
+
+    // Método para listar todos os usuários
+    public static List<Usuario> listarUsuarios() {
+        List<Usuario> usuarios = new ArrayList<>();
+        String sql = "SELECT * FROM usuario";
+        try (Connection conexao = Conexao.conectar();
+             PreparedStatement stmt = conexao.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                usuarios.add(new Usuario(
+                    rs.getInt("id"),
+                    rs.getString("nome"),
+                    rs.getString("email"),
+                    rs.getString("senha")
+                ));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao listar usuários: " + e.getMessage(), e);
+        }
+        return usuarios;
+    }
+
+    // Método para filtrar usuários por nome e email
+    public static List<Usuario> filtrarUsuarios(String nome, String email) {
+        List<Usuario> listaUsuarios = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM usuario WHERE 1=1");
+
+        if (nome != null && !nome.isEmpty()) {
+            sql.append(" AND nome LIKE ?");
+        }
+        if (email != null && !email.isEmpty()) {
+            sql.append(" AND email LIKE ?");
+        }
+
+        try (Connection conexao = Conexao.conectar();
+             PreparedStatement stmt = conexao.prepareStatement(sql.toString())) {
+
+            int index = 1;
+            if (nome != null && !nome.isEmpty()) {
+                stmt.setString(index++, "%" + nome + "%");
+            }
+            if (email != null && !email.isEmpty()) {
+                stmt.setString(index++, "%" + email + "%");
+            }
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                listaUsuarios.add(new Usuario(
+                    rs.getInt("id"),
+                    rs.getString("nome"),
+                    rs.getString("email"),
+                    rs.getString("senha")
+                ));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao filtrar usuários: " + e.getMessage(), e);
+        }
+
+        return listaUsuarios;
+    }
+
+    // Método para realizar uma doação
     public static boolean realizarDoacao(Usuario usuario, Projeto projeto, BigDecimal valor) {
         String sqlDoacao = "INSERT INTO doacao (id_usuario, id_projeto, valor, data) VALUES (?, ?, ?, ?)";
         String sqlAtualizacaoProjeto = "UPDATE projeto SET arrecadacao = arrecadacao + ? WHERE id = ?";
-        
+
         try (Connection conexao = Conexao.conectar()) {
             conexao.setAutoCommit(false);
 
@@ -178,7 +237,7 @@ public class UsuarioDAO {
         }
     }
 
-
+    // Método para listar doações de um projeto
     public static List<String> listaDoacoesProjeto(int idProjeto) {
         List<String> listaDoacoes = new ArrayList<>();
         String sql = "SELECT u.nome AS usuario, u.email, d.valor, d.data, p.nome AS projeto " +
@@ -213,7 +272,8 @@ public class UsuarioDAO {
         }
         return listaDoacoes;
     }
-    
+
+    // Método para listar doações de um usuário
     public static List<String> listaDoacoesUsuario(int idUsuario) {
         List<String> listaDoacoes = new ArrayList<>();
         String sql = "SELECT u.nome AS usuario, u.email, d.valor, d.data, p.nome AS projeto " +
@@ -249,4 +309,3 @@ public class UsuarioDAO {
         return listaDoacoes;
     }
 }
-

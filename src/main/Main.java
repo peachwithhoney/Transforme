@@ -37,7 +37,7 @@ public class Main {
         novoProjeto.setDescricao("A fundable company");
         novoProjeto.setMetaFinanceira(new BigDecimal("400000.00"));
         novoProjeto.setArrecadacao(new BigDecimal("0.00"));
-        novoProjeto.setDataCriacao(new Date(13, 2, 2023)); // Ajuste a data conforme necessário
+        novoProjeto.setDataCriacao(new Date(13, 2, 2023)); 
         ProjetoDAO.inserirProjeto(novoProjeto);
 
         // 

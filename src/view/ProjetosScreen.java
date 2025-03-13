@@ -96,21 +96,20 @@ public class ProjetosScreen extends JFrame {
             }
         });
 
-        // Dropdown para "Projetos"
+        // Link para "Projetos"
         JLabel projetosLabel = new JLabel("Projetos");
         projetosLabel.setForeground(Color.WHITE);
         projetosLabel.setFont(new Font("Arial", Font.BOLD, 16));
-
-        JPopupMenu projetosMenu = new JPopupMenu();
-        JMenuItem projeto1Item = new JMenuItem("Projeto 1");
-        JMenuItem projeto2Item = new JMenuItem("Projeto 2");
-        projetosMenu.add(projeto1Item);
-        projetosMenu.add(projeto2Item);
+        projetosLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); 
 
         projetosLabel.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseEntered(MouseEvent e) {
-                projetosMenu.show(projetosLabel, 0, projetosLabel.getHeight());
+            public void mouseClicked(MouseEvent e) {
+                
+                dispose();
+                
+                ProjetosScreen projetosScreen = new ProjetosScreen();
+                projetosScreen.setVisible(true);
             }
         });
 
@@ -260,9 +259,9 @@ public class ProjetosScreen extends JFrame {
             );
 
             if (confirmacao == JOptionPane.YES_OPTION) {
-                // Exclui o projeto do banco de dados
+                
                 ProjetoDAO.deletarProjeto(projeto.getId());
-                // Atualiza a lista de projetos
+                
                 atualizarListaProjetos(ProjetoDAO.listaProjeto());
                 JOptionPane.showMessageDialog(this, "Projeto excluído com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             }
@@ -275,7 +274,7 @@ public class ProjetosScreen extends JFrame {
         return projetoPanel;
     }
 
-    // Método para atualizar a lista de projetos exibida
+    // Lista de projetos exibida
     public void atualizarListaProjetos(List<Projeto> projetos) {
         JPanel centerPanel = (JPanel) getContentPane().getComponent(1);
         centerPanel.removeAll();

@@ -88,11 +88,11 @@ public class LoginScreen extends JFrame {
             // Autentica o usuário
             Usuario usuario = UsuarioDAO.autenticarUsuario(email, senha);
 
-            if (usuario != null && usuario.isLogado()) {
+            if (usuario != null) {
                 JOptionPane.showMessageDialog(this, "Login realizado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-                // Fecha a tela de login
+                
                 dispose();
-                // Abre a tela de projetos
+                
                 ProjetosScreen projetosScreen = new ProjetosScreen();
                 projetosScreen.setVisible(true);
             } else {
@@ -117,10 +117,10 @@ public class LoginScreen extends JFrame {
         add(mainPanel);
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            LoginScreen loginScreen = new LoginScreen();
-            loginScreen.setVisible(true);
-        });
+    
+    public void redirecionarParaProjetosScreen() {
+        dispose(); 
+        ProjetosScreen projetosScreen = new ProjetosScreen();
+        projetosScreen.setVisible(true);
     }
 }

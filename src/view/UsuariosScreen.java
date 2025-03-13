@@ -1,11 +1,12 @@
 package view;
 
+import DAO.UsuarioDAO;
+import classes.Usuario;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 import javax.swing.*;
-import DAO.*;
-import classes.*;
 import view.popups.PopupCadastrarUsuarios;
 
 public class UsuariosScreen extends JFrame {
@@ -53,11 +54,11 @@ public class UsuariosScreen extends JFrame {
 
         mainPanel.add(footerPanel, BorderLayout.SOUTH);
 
-        // Adiciona o painel principal à janela
+        
         add(mainPanel);
     }
 
-    // Método para criar o header
+    // Header
     private JPanel criarHeader() {
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(new Color(28, 95, 138));
@@ -69,11 +70,11 @@ public class UsuariosScreen extends JFrame {
         casaLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         headerPanel.add(casaLabel, BorderLayout.WEST);
 
-        // Texto "Cadastro" e "Projetos" no centro com dropdown
+        // Texto "Cadastro" e "Projetos" no centro
         JPanel menuPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         menuPanel.setBackground(new Color(28, 95, 138));
 
-        // Dropdown para "Cadastro"
+        // Link para "Cadastro" 
         JLabel cadastroLabel = new JLabel("Cadastro");
         cadastroLabel.setForeground(Color.WHITE);
         cadastroLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -97,21 +98,16 @@ public class UsuariosScreen extends JFrame {
             }
         });
 
-        // Dropdown para "Projetos"
+        // Link para "Projetos" 
         JLabel projetosLabel = new JLabel("Projetos");
         projetosLabel.setForeground(Color.WHITE);
         projetosLabel.setFont(new Font("Arial", Font.BOLD, 16));
-
-        JPopupMenu projetosMenu = new JPopupMenu();
-        JMenuItem projeto1Item = new JMenuItem("Projeto 1");
-        JMenuItem projeto2Item = new JMenuItem("Projeto 2");
-        projetosMenu.add(projeto1Item);
-        projetosMenu.add(projeto2Item);
+        projetosLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         projetosLabel.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseEntered(MouseEvent e) {
-                projetosMenu.show(projetosLabel, 0, projetosLabel.getHeight());
+            public void mouseClicked(MouseEvent e) {
+                redirecionarParaProjetosScreen();
             }
         });
 
@@ -127,15 +123,111 @@ public class UsuariosScreen extends JFrame {
         JPopupMenu logoutMenu = new JPopupMenu();
         JMenuItem logoutItem = new JMenuItem("Logout");
         logoutItem.addActionListener(e -> {
-            // Fecha a tela de usuários
-            dispose();
-            // Abre a tela de login
-            LoginScreen loginScreen = new LoginScreen();
-            loginScreen.setVisible(true);
+            redirecionarParaLoginScreen();
         });
         logoutMenu.add(logoutItem);
 
         usuarioLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-               
+                logoutMenu.show(usuarioLabel, 0, usuarioLabel.getHeight());
+            }
+        });
+
+        headerPanel.add(usuarioLabel, BorderLayout.EAST);
+
+        return headerPanel; 
+    }
+
+    // Método para criar o balão de filtros
+    private JPanel criarBalaoFiltros() {
+        JPanel filtrosPanel = new JPanel();
+        filtrosPanel.setBackground(new Color(240, 240, 240));
+        filtrosPanel.setBorder(BorderFactory.createTitledBorder("Filtros"));
+        filtrosPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+        // Campo de filtro por nome
+        JTextField filtroNomeField = new JTextField(20);
+        filtroNomeField.setToolTipText("Filtrar por nome");
+        filtrosPanel.add(new JLabel("Nome:"));
+        filtrosPanel.add(filtroNomeField);
+
+        // Campo de filtro por email
+        JTextField filtroEmailField = new JTextField(20);
+        filtroEmailField.setToolTipText("Filtrar por email");
+        filtrosPanel.add(new JLabel("Email:"));
+        filtrosPanel.add(filtroEmailField);
+
+        // Botão de aplicar filtro
+        JButton aplicarFiltroButton = new JButton("Aplicar Filtro");
+        aplicarFiltroButton.addActionListener(e -> {
+            String nome = filtroNomeField.getText();
+            String email = filtroEmailField.getText();
+            List<Usuario> usuariosFiltrados = UsuarioDAO.filtrarUsuarios(nome, email);
+            atualizarListaUsuarios(usuariosFiltrados);
+        });
+        filtrosPanel.add(aplicarFiltroButton);
+
+        return filtrosPanel;
+    }
+
+    // Método para criar o balão de lista de usuários
+    private JPanel criarBalaoUsuarios() {
+        JPanel usuariosPanel = new JPanel();
+        usuariosPanel.setBackground(new Color(240, 240, 240));
+        usuariosPanel.setBorder(BorderFactory.createTitledBorder("Lista de Usuários"));
+        usuariosPanel.setLayout(new BoxLayout(usuariosPanel, BoxLayout.Y_AXIS));
+
+        // Busca a lista de usuários do banco de dados
+        List<Usuario> usuarios = UsuarioDAO.listarUsuarios();
+
+        // Cria a lista de usuários
+        DefaultListModel<String> listaUsuariosModel = new DefaultListModel<>();
+        for (Usuario usuario : usuarios) {
+            listaUsuariosModel.addElement(usuario.getNome() + " - " + usuario.getEmail());
+        }
+
+        JList<String> listaUsuarios = new JList<>(listaUsuariosModel);
+        listaUsuarios.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        listaUsuarios.setBackground(Color.WHITE);
+
+        
+        JScrollPane scrollPane = new JScrollPane(listaUsuarios);
+        usuariosPanel.add(scrollPane);
+
+        return usuariosPanel;
+    }
+
+    // Atualizar a lista de usuários na interface
+    private void atualizarListaUsuarios(List<Usuario> usuarios) {
+        DefaultListModel<String> listaUsuariosModel = new DefaultListModel<>();
+        for (Usuario usuario : usuarios) {
+            listaUsuariosModel.addElement(usuario.getNome() + " - " + usuario.getEmail());
+        }
+
+        JList<String> listaUsuarios = new JList<>(listaUsuariosModel);
+        listaUsuarios.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        listaUsuarios.setBackground(Color.WHITE);
+
+        // Atualiza o painel de usuários
+        JPanel usuariosPanel = (JPanel) getContentPane().getComponent(1);
+        usuariosPanel.removeAll();
+        usuariosPanel.add(new JScrollPane(listaUsuarios));
+        usuariosPanel.revalidate();
+        usuariosPanel.repaint();
+    }
+
+    // Redirecionar para a tela de projetos
+    public void redirecionarParaProjetosScreen() {
+        dispose(); 
+        ProjetosScreen projetosScreen = new ProjetosScreen();
+        projetosScreen.setVisible(true);
+    }
+
+    
+    public void redirecionarParaLoginScreen() {
+        dispose(); 
+        LoginScreen loginScreen = new LoginScreen();
+        loginScreen.setVisible(true);
+    }
+}

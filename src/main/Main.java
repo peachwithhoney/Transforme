@@ -1,6 +1,7 @@
 package main;
 
 import javax.swing.SwingUtilities;
+
 import view.LoginScreen;
 
 public class Main {

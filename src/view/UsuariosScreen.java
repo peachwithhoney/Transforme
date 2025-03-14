@@ -48,7 +48,7 @@ public class UsuariosScreen extends JFrame {
         footerPanel.setBackground(Color.WHITE);
         footerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        ImageIcon logoIcon = new ImageIcon("caminho/para/logo_pequeno.png");
+        ImageIcon logoIcon = new ImageIcon("src/assets/LogoPequeno100x40.png");
         JLabel logoLabel = new JLabel(logoIcon);
         footerPanel.add(logoLabel);
 
@@ -65,7 +65,7 @@ public class UsuariosScreen extends JFrame {
         headerPanel.setPreferredSize(new Dimension(1000, 60));
 
         // Ícone de casa no canto esquerdo
-        ImageIcon casaIcon = new ImageIcon("caminho/para/casa_icone.png");
+        ImageIcon casaIcon = new ImageIcon("src/assets/LogoDaCasa40x40.png");
         JLabel casaLabel = new JLabel(casaIcon);
         casaLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         headerPanel.add(casaLabel, BorderLayout.WEST);
@@ -116,7 +116,7 @@ public class UsuariosScreen extends JFrame {
         headerPanel.add(menuPanel, BorderLayout.CENTER);
 
         // Ícone de usuário no canto direito com dropdown para logout
-        ImageIcon usuarioIcon = new ImageIcon("caminho/para/usuario_icone.png");
+        ImageIcon usuarioIcon = new ImageIcon("src/assets/LogoDeUsuario40x40.png");
         JLabel usuarioLabel = new JLabel(usuarioIcon);
         usuarioLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 

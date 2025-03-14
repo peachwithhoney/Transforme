@@ -262,7 +262,8 @@ public class ProjetosScreen extends JFrame {
                 
                 ProjetoDAO.deletarProjeto(projeto.getId());
                 
-                atualizarListaProjetos(ProjetoDAO.listaProjeto());
+                redirecionarParaProjetosScreen();
+                //(ProjetoDAO.listaProjeto());
                 JOptionPane.showMessageDialog(this, "Projeto excluído com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             }
         });
@@ -303,5 +304,11 @@ public class ProjetosScreen extends JFrame {
             ProjetosScreen projetosScreen = new ProjetosScreen();
             projetosScreen.setVisible(true);
         });
+    }
+    
+    public void redirecionarParaProjetosScreen() {
+        dispose(); 
+        ProjetosScreen projetosScreen = new ProjetosScreen();
+        projetosScreen.setVisible(true);
     }
 }

@@ -84,10 +84,10 @@ public class LoginScreen extends JFrame {
         loginButton.addActionListener(e -> {
             String email = emailField.getText();
             String senha = new String(passwordField.getPassword());
-
+            
             // Autentica o usuário
             Usuario usuario = UsuarioDAO.autenticarUsuario(email, senha);
-
+     
             if (usuario != null) {
                 JOptionPane.showMessageDialog(this, "Login realizado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                 
@@ -96,6 +96,7 @@ public class LoginScreen extends JFrame {
                 ProjetosScreen projetosScreen = new ProjetosScreen();
                 projetosScreen.setVisible(true);
             } else {
+            	System.out.println("Testeeee");
                 JOptionPane.showMessageDialog(this, "Email ou senha incorretos.", "Erro", JOptionPane.ERROR_MESSAGE);
             }
         });

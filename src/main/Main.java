@@ -1,8 +1,15 @@
 package main;
 
+import classes.*;
+import DAO.*;
+import view.*;
+
+import java.math.BigDecimal;
+import java.sql.Date;
+
 import javax.swing.SwingUtilities;
 
-import view.LoginScreen;
+
 
 public class Main {
 
@@ -32,16 +39,16 @@ public class Main {
             System.out.println("Projeto não encontrado.");
         }
 
-        // 
+        */
         Projeto novoProjeto = new Projeto();
-        novoProjeto.setNome("Teste3");
-        novoProjeto.setDescricao("A fundable company");
+        novoProjeto.setNome("Daredevil");
+        novoProjeto.setDescricao("A blind company");
         novoProjeto.setMetaFinanceira(new BigDecimal("400000.00"));
         novoProjeto.setArrecadacao(new BigDecimal("0.00"));
         novoProjeto.setDataCriacao(new Date(13, 2, 2023)); 
         ProjetoDAO.inserirProjeto(novoProjeto);
-
-        // 
+        
+        /*
         ProjetoDAO.listaProjeto();
 
         // 

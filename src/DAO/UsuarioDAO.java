@@ -98,29 +98,35 @@ public class UsuarioDAO {
 
     // Método para autenticar um usuário
     public static Usuario autenticarUsuario(String email, String senha) {
-        String sql = "SELECT * FROM usuario WHERE email = ?";
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        Connection con = Conexao.conectar();
+        Usuario usuario = null;
 
+        try {
+            String sql = "SELECT * FROM usuario WHERE email = ? AND senha = ?";
+            PreparedStatement stmt = con.prepareStatement(sql);
             stmt.setString(1, email);
+            stmt.setString(2, senha);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                String senhaHash = rs.getString("senha");
-                if (senhaHash.equals(hashSenha(senha))) {
-                    return new Usuario(
-                        rs.getInt("id"),
-                        rs.getString("nome"),
-                        email,
-                        senhaHash
-                    );
-                }
+                usuario = new Usuario(
+                    rs.getInt("id"),
+                    rs.getString("nome"),
+                    rs.getString("email"),
+                    rs.getString("senha")
+                );
             }
+
+            rs.close();
+            stmt.close();
+            con.close();
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao autenticar usuário: " + e.getMessage(), e);
+            e.printStackTrace();
         }
-        return null;
+
+        return usuario;
     }
+
 
     // Método para criptografar a senha
     private static String hashSenha(String senha) {

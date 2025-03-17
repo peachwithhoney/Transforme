@@ -2,7 +2,7 @@
  * 
  */
 /**
- * @author arthu
+ * @author arthur and clarissa
  *
  */
 module Transforme {

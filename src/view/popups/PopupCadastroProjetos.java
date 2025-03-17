@@ -9,16 +9,21 @@ import view.ProjetosScreen;
 
 public class PopupCadastroProjetos extends JDialog {
 
-    private ProjetosScreen projetosScreen; 
+    private ProjetosScreen projetosScreen;
 
-    public PopupCadastroProjetos(ProjetosScreen parent) {
+    
+    public PopupCadastroProjetos(JFrame parent) {
         super(parent, "Cadastrar Projeto", true); 
-        this.projetosScreen = parent; 
         setSize(400, 300);
         setLocationRelativeTo(parent);
         setLayout(new BorderLayout());
         getRootPane().setBorder(BorderFactory.createLineBorder(new Color(28, 95, 138), 2, true)); 
 
+        
+        if (parent instanceof ProjetosScreen projetosScreen) {
+            this.projetosScreen = projetosScreen;
+        }
+        
         // Painel principal do popup
         JPanel popupPanel = new JPanel();
         popupPanel.setLayout(new BoxLayout(popupPanel, BoxLayout.Y_AXIS));
@@ -92,11 +97,12 @@ public class PopupCadastroProjetos extends JDialog {
                 // Mensagem de sucesso
                 JOptionPane.showMessageDialog(this, "Projeto salvo com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
 
-                
                 dispose();
 
-                // Atualiza a lista de projetos na tela de projetos
-                projetosScreen.atualizarListaProjetos(ProjetoDAO.listaProjeto());
+                // Atualiza a lista de projetos, se a tela for ProjetosScreen
+                if (projetosScreen != null) {
+                    projetosScreen.atualizarListaProjetos(ProjetoDAO.listaProjeto());
+                }
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Meta financeira inválida! Use números.", "Erro", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {

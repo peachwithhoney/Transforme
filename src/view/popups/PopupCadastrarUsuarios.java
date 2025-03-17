@@ -1,13 +1,20 @@
 package view.popups;
 
+import DAO.UsuarioDAO;
+import classes.Usuario;
 import java.awt.*;
 import java.util.Arrays;
 import javax.swing.*;
+import view.ProjetosScreen;
+import view.UsuariosScreen;
 
 public class PopupCadastrarUsuarios extends JDialog {
 
     private static final Color PRIMARY_COLOR = new Color(28, 95, 138);
     private static final Dimension FIELD_SIZE = new Dimension(300, 30);
+
+    private UsuariosScreen usuariosScreen;
+    private ProjetosScreen projetosScreen;
 
     public PopupCadastrarUsuarios(JFrame parent) {
         super(parent, "Cadastrar Usuário", true);
@@ -15,6 +22,13 @@ public class PopupCadastrarUsuarios extends JDialog {
         setLocationRelativeTo(parent);
         setLayout(new BorderLayout());
         getRootPane().setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        if (parent instanceof UsuariosScreen u) {
+            this.usuariosScreen = u;
+        } else if (parent instanceof ProjetosScreen p) {
+            this.projetosScreen = p;
+        }
+        
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -49,7 +63,7 @@ public class PopupCadastrarUsuarios extends JDialog {
 
         cadastrarButton.addActionListener(e -> {
             String nome = nomeField.getText().trim();
-            String email = emailField.getText().trim(); 
+            String email = emailField.getText().trim();
             char[] senha = senhaField.getPassword();
             char[] confirmarSenha = confirmarSenhaField.getPassword();
 
@@ -63,8 +77,20 @@ public class PopupCadastrarUsuarios extends JDialog {
                 return;
             }
 
+            Usuario novoUsuario = new Usuario(0, nome, email, new String(senha));
+            UsuarioDAO.inserirUsuario(novoUsuario);
+
             JOptionPane.showMessageDialog(this, "Usuário cadastrado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             dispose();
+
+            if (usuariosScreen != null) {
+                usuariosScreen.atualizarListaUsuarios(UsuarioDAO.listarUsuarios());
+
+            }
+            if (projetosScreen != null) {
+                usuariosScreen.atualizarListaUsuarios(UsuarioDAO.listarUsuarios());
+
+            }
         });
 
         cancelarButton.addActionListener(e -> dispose());
@@ -74,7 +100,7 @@ public class PopupCadastrarUsuarios extends JDialog {
         buttonPanel.add(cadastrarButton);
         buttonPanel.add(cancelarButton);
 
-        add(panel, BorderLayout.CENTER); 
+        add(panel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
     }
 

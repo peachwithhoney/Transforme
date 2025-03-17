@@ -7,8 +7,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 import javax.swing.*;
+import view.popups.PopupAlterarProjeto;
 import view.popups.PopupCadastrarUsuarios;
 import view.popups.PopupCadastroProjetos;
+
 
 public class ProjetosScreen extends JFrame {
     private final JPanel centerPanel;
@@ -254,6 +256,11 @@ public class ProjetosScreen extends JFrame {
 
         JButton alterarButton = new JButton("Alterar");
         JButton excluirButton = new JButton("Excluir");
+
+        alterarButton.addActionListener(e -> {
+            PopupAlterarProjeto popupAlterarProjeto = new PopupAlterarProjeto(this, projeto);
+            popupAlterarProjeto.setVisible(true);
+        });
 
         excluirButton.addActionListener(e -> {
             int confirmacao = JOptionPane.showConfirmDialog(

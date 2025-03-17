@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "Transforme/main.Main",
+            "projectName": "Transforme"
+        },
+        {
+            "type": "java",
+            "name": "Launch Main",
+            "request": "launch",
+            "mainClass": "main.Main.java",
+            "projectName": "Transforme",
+            "classPaths": [
+                "lib/mysql-connector-j-9.2.0.jar"
+            ],
+            "args": ""
+        }
+    ]
+}

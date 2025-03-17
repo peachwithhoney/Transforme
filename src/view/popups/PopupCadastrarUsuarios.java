@@ -12,7 +12,7 @@ import static javax.swing.JOptionPane.*;
 public class PopupCadastrarUsuarios extends JDialog {
 
     private static final Color PRIMARY_COLOR = new Color(28, 95, 138);
-    private static final Dimension FIELD_SIZE = new Dimension(300, 30); // ← Aqui estava o erro de chave
+    private static final Dimension FIELD_SIZE = new Dimension(300, 30);
 
     public PopupCadastrarUsuarios(JFrame parent) {
         super(parent, "Cadastrar Usuário", true);

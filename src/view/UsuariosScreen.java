@@ -10,6 +10,7 @@ import javax.swing.*;
 import view.popups.PopupAlterarUsuario;
 import view.popups.PopupCadastrarUsuarios;
 import view.popups.PopupCadastroProjetos;
+import view.popups.PopupDoacao;
 
 
 public class UsuariosScreen extends JFrame {
@@ -128,6 +129,10 @@ public class UsuariosScreen extends JFrame {
         menuPanel.add(cadastroLabel);
         menuPanel.add(projetosLabel);
         menuPanel.add(usuariosLabel);
+        
+        JButton doacaoButton = criarBotaoDoacao();
+        menuPanel.add(doacaoButton);
+
         headerPanel.add(menuPanel, BorderLayout.CENTER);
 
         
@@ -229,6 +234,24 @@ public class UsuariosScreen extends JFrame {
 
         return usuariosPanel;
     }
+
+    private JButton criarBotaoDoacao() {
+        JButton doacaoButton = new JButton("Doar");
+        doacaoButton.setBackground(new Color(255, 87, 34)); // Cor destacada (laranja)
+        doacaoButton.setForeground(Color.WHITE);
+        doacaoButton.setFont(new Font("Arial", Font.BOLD, 14));
+        doacaoButton.setFocusPainted(false);
+        doacaoButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        doacaoButton.setPreferredSize(new Dimension(100, 30));
+
+        doacaoButton.addActionListener(e -> {
+            PopupDoacao popupDoacao = new PopupDoacao(this);
+            popupDoacao.setVisible(true);
+        });
+
+    return doacaoButton;
+}
+
 
     private JPanel criarUsuarioPanel(Usuario usuario) {
         JPanel usuarioPanel = new JPanel(new BorderLayout());

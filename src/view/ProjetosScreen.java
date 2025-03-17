@@ -10,6 +10,7 @@ import javax.swing.*;
 import view.popups.PopupAlterarProjeto;
 import view.popups.PopupCadastrarUsuarios;
 import view.popups.PopupCadastroProjetos;
+import view.popups.PopupDoacao;
 
 
 public class ProjetosScreen extends JFrame {
@@ -132,6 +133,9 @@ public class ProjetosScreen extends JFrame {
         menuPanel.add(cadastroLabel);
         menuPanel.add(projetosLabel);
         menuPanel.add(usuariosLabel);
+        JButton doacaoButton = criarBotaoDoacao();
+        menuPanel.add(doacaoButton);
+
         headerPanel.add(menuPanel, BorderLayout.CENTER);
 
         ImageIcon usuarioIcon = new ImageIcon("src/assets/LogoDeUsuario40x40.png");
@@ -158,6 +162,24 @@ public class ProjetosScreen extends JFrame {
 
         return headerPanel;
     }
+
+    private JButton criarBotaoDoacao() {
+        JButton doacaoButton = new JButton("Doar");
+        doacaoButton.setBackground(new Color(255, 87, 34)); // Cor destacada (laranja)
+        doacaoButton.setForeground(Color.WHITE);
+        doacaoButton.setFont(new Font("Arial", Font.BOLD, 14));
+        doacaoButton.setFocusPainted(false);
+        doacaoButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        doacaoButton.setPreferredSize(new Dimension(100, 30));
+
+        doacaoButton.addActionListener(e -> {
+            PopupDoacao popupDoacao = new PopupDoacao(this);
+            popupDoacao.setVisible(true);
+        });
+
+    return doacaoButton;
+}
+
 
     private JPanel criarBalaoFiltros() {
         JPanel filtrosPanel = new JPanel();
@@ -242,26 +264,55 @@ public class ProjetosScreen extends JFrame {
         JPanel projetoPanel = new JPanel(new BorderLayout());
         projetoPanel.setBackground(Color.WHITE);
         projetoPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
-
+    
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.setBackground(Color.WHITE);
-        infoPanel.add(new JLabel(projeto.getNome()));
-        infoPanel.add(new JLabel(projeto.getDescricao()));
-        infoPanel.add(new JLabel("Meta: R$ " + projeto.getMetaFinanceira()));
+    
+        JLabel nomeLabel = new JLabel(projeto.getNome());
+        JLabel descricaoLabel = new JLabel(projeto.getDescricao());
+    
+        double meta = projeto.getMetaFinanceira().doubleValue();
+        double arrecadado = projeto.getArrecadacao().doubleValue();
+        JLabel metaLabel = new JLabel(String.format("Meta: R$ %.2f | Arrecadado: R$ %.2f", meta, arrecadado));
+    
+        // Cálculo da porcentagem arrecadada
+        double percentual = (arrecadado / meta) * 100;
+        Color corIndicador;
+        if (percentual < 50) {
+            corIndicador = Color.RED;
+        } else if (percentual < 100) {
+            corIndicador = Color.ORANGE;
+        } else {
+            corIndicador = Color.GREEN;
+        }
+    
+        JLabel indicadorLabel = new JLabel("●");
+        indicadorLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        indicadorLabel.setForeground(corIndicador);
+    
+        JPanel metaPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        metaPanel.setBackground(Color.WHITE);
+        metaPanel.add(metaLabel);
+        metaPanel.add(indicadorLabel);
+    
+        infoPanel.add(nomeLabel);
+        infoPanel.add(descricaoLabel);
+        infoPanel.add(metaPanel);
+    
         projetoPanel.add(infoPanel, BorderLayout.CENTER);
-
+    
         JPanel acoesPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         acoesPanel.setBackground(Color.WHITE);
-
+    
         JButton alterarButton = new JButton("Alterar");
         JButton excluirButton = new JButton("Excluir");
-
+    
         alterarButton.addActionListener(e -> {
             PopupAlterarProjeto popupAlterarProjeto = new PopupAlterarProjeto(this, projeto);
             popupAlterarProjeto.setVisible(true);
         });
-
+    
         excluirButton.addActionListener(e -> {
             int confirmacao = JOptionPane.showConfirmDialog(
                 this,
@@ -269,7 +320,7 @@ public class ProjetosScreen extends JFrame {
                 "Confirmar Exclusão",
                 JOptionPane.YES_NO_OPTION
             );
-
+    
             if (confirmacao == JOptionPane.YES_OPTION) {
                 System.out.println("Tentando excluir projeto com ID: " + projeto.getId());
                 ProjetoDAO.deletarProjeto(projeto.getId());
@@ -277,13 +328,13 @@ public class ProjetosScreen extends JFrame {
                 JOptionPane.showMessageDialog(this, "Projeto excluído com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             }
         });
-
+    
         acoesPanel.add(alterarButton);
         acoesPanel.add(excluirButton);
         projetoPanel.add(acoesPanel, BorderLayout.EAST);
-
+    
         return projetoPanel;
-    }
+    }    
 
     public void atualizarListaProjetos(List<Projeto> projetos) {
         centerPanel.removeAll();

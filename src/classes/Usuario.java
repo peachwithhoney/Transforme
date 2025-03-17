@@ -9,6 +9,8 @@ public class Usuario {
     private String senha;
     private boolean logado;
 
+    private static Usuario usuarioLogado;
+
     public Usuario() {
         this.logado = false;  
     }
@@ -27,28 +29,35 @@ public class Usuario {
         this.senha = senha;
         this.logado = false;  
     }
-    
-    
+
     public static Usuario loginUsuario(String email, String senha) {
         Usuario usuarioAutenticado = UsuarioDAO.autenticarUsuario(email, senha);
 
-    if (usuarioAutenticado != null) {
-        usuarioAutenticado.setLogado(true);
+        if (usuarioAutenticado != null) {
+            usuarioAutenticado.setLogado(true);
+            usuarioLogado = usuarioAutenticado; // Define o usuário logado
+            System.out.println("Usuário logado: " + usuarioAutenticado.getNome());
+        } else {
+            System.out.println("Falha na autenticação. Verifique suas credenciais.");
+        }
+
+        return usuarioAutenticado; 
     }
 
-    return usuarioAutenticado; 
-}
-
-    public static void logoutUsuario(Usuario usuario) {
-        if (usuario != null && usuario.isLogado()) {
-            usuario.setLogado(false);  
+    public static void logoutUsuario() {
+        if (usuarioLogado != null) {
+            usuarioLogado.setLogado(false);  
+            usuarioLogado = null; // Remove o usuário logado
             System.out.println("Usuário deslogado com sucesso!");
         } else {
             System.out.println("Nenhum usuário está logado.");
         }
     }
 
-    
+    public static Usuario getUsuarioLogado() {
+        return usuarioLogado;
+    }
+
     public int getId() {
         return id;
     }

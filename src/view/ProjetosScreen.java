@@ -1,5 +1,6 @@
 package view;
 
+import DAO.DoacaoDAO;
 import DAO.ProjetoDAO;
 import classes.Projeto;
 import java.awt.*;
@@ -11,7 +12,6 @@ import view.popups.PopupAlterarProjeto;
 import view.popups.PopupCadastrarUsuarios;
 import view.popups.PopupCadastroProjetos;
 import view.popups.PopupDoacao;
-
 
 public class ProjetosScreen extends JFrame {
     private final JPanel centerPanel;
@@ -38,6 +38,15 @@ public class ProjetosScreen extends JFrame {
         centerPanel.add(Box.createVerticalStrut(20));
 
         JPanel projetosPanel = criarBalaoProjetos();
+        List<Projeto> projetos = ProjetoDAO.listaProjeto();
+        projetosPanel.setPreferredSize(new Dimension(900, Math.max(400, projetos.size() * 80))); 
+        projetosPanel.setMaximumSize(null); 
+
+        JScrollPane scrollProjetos = new JScrollPane(projetosPanel);
+        scrollProjetos.setPreferredSize(new Dimension(900, 400)); 
+        scrollProjetos.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollProjetos.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
         centerPanel.add(projetosPanel);
 
         mainPanel.add(centerPanel, BorderLayout.CENTER);
@@ -58,17 +67,14 @@ public class ProjetosScreen extends JFrame {
         headerPanel.setBackground(new Color(28, 95, 138));
         headerPanel.setPreferredSize(new Dimension(1000, 60));
 
-        
         ImageIcon casaIcon = new ImageIcon("src/assets/LogoDaCasa40x40.png");
         JLabel casaLabel = new JLabel(casaIcon);
         casaLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         headerPanel.add(casaLabel, BorderLayout.WEST);
 
-        
         JPanel menuPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         menuPanel.setBackground(new Color(28, 95, 138));
 
-        
         JLabel cadastroLabel = new JLabel("Cadastro");
         cadastroLabel.setForeground(Color.WHITE);
         cadastroLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -77,13 +83,11 @@ public class ProjetosScreen extends JFrame {
         JMenuItem usuariosItem = new JMenuItem("Usuários");
         JMenuItem projetosItem = new JMenuItem("Projetos");
 
-        
         usuariosItem.addActionListener((actionEvent) -> {
             PopupCadastrarUsuarios popupUsuarios = new PopupCadastrarUsuarios(this);
             popupUsuarios.setVisible(true);
         });
 
-        
         projetosItem.addActionListener((actionEvent) -> {
             PopupCadastroProjetos popupProjetos = new PopupCadastroProjetos(this);
             popupProjetos.setVisible(true);
@@ -99,7 +103,6 @@ public class ProjetosScreen extends JFrame {
             }
         });
 
-        
         JLabel projetosLabel = new JLabel("Projetos");
         projetosLabel.setForeground(Color.WHITE);
         projetosLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -114,7 +117,6 @@ public class ProjetosScreen extends JFrame {
             }
         });
 
-        
         JLabel usuariosLabel = new JLabel("Usuários");
         usuariosLabel.setForeground(Color.WHITE);
         usuariosLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -129,7 +131,6 @@ public class ProjetosScreen extends JFrame {
             }
         });
 
-        
         menuPanel.add(cadastroLabel);
         menuPanel.add(projetosLabel);
         menuPanel.add(usuariosLabel);
@@ -165,7 +166,7 @@ public class ProjetosScreen extends JFrame {
 
     private JButton criarBotaoDoacao() {
         JButton doacaoButton = new JButton("Doar");
-        doacaoButton.setBackground(new Color(255, 87, 34)); // Cor destacada (laranja)
+        doacaoButton.setBackground(new Color(255, 87, 34)); 
         doacaoButton.setForeground(Color.WHITE);
         doacaoButton.setFont(new Font("Arial", Font.BOLD, 14));
         doacaoButton.setFocusPainted(false);
@@ -173,13 +174,13 @@ public class ProjetosScreen extends JFrame {
         doacaoButton.setPreferredSize(new Dimension(100, 30));
 
         doacaoButton.addActionListener(e -> {
-            PopupDoacao popupDoacao = new PopupDoacao(this);
+            Frame parentFrame = (Frame) SwingUtilities.getWindowAncestor(this);
+            PopupDoacao popupDoacao = new PopupDoacao(parentFrame, this::atualizarListaProjetos);
             popupDoacao.setVisible(true);
         });
 
-    return doacaoButton;
-}
-
+        return doacaoButton;
+    }
 
     private JPanel criarBalaoFiltros() {
         JPanel filtrosPanel = new JPanel();
@@ -272,12 +273,13 @@ public class ProjetosScreen extends JFrame {
         JLabel nomeLabel = new JLabel(projeto.getNome());
         JLabel descricaoLabel = new JLabel(projeto.getDescricao());
     
+        
+        double totalArrecadado = DoacaoDAO.getTotalArrecadado(projeto.getId());
         double meta = projeto.getMetaFinanceira().doubleValue();
-        double arrecadado = projeto.getArrecadacao().doubleValue();
-        JLabel metaLabel = new JLabel(String.format("Meta: R$ %.2f | Arrecadado: R$ %.2f", meta, arrecadado));
     
-        // Cálculo da porcentagem arrecadada
-        double percentual = (arrecadado / meta) * 100;
+        JLabel metaLabel = new JLabel(String.format("Meta: R$ %.2f | Arrecadado: R$ %.2f", meta, totalArrecadado));
+    
+        double percentual = (totalArrecadado / meta) * 100;
         Color corIndicador;
         if (percentual < 50) {
             corIndicador = Color.RED;
@@ -322,7 +324,6 @@ public class ProjetosScreen extends JFrame {
             );
     
             if (confirmacao == JOptionPane.YES_OPTION) {
-                System.out.println("Tentando excluir projeto com ID: " + projeto.getId());
                 ProjetoDAO.deletarProjeto(projeto.getId());
                 atualizarListaProjetos(ProjetoDAO.listaProjeto());
                 JOptionPane.showMessageDialog(this, "Projeto excluído com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
@@ -334,8 +335,15 @@ public class ProjetosScreen extends JFrame {
         projetoPanel.add(acoesPanel, BorderLayout.EAST);
     
         return projetoPanel;
-    }    
+    }
+    
 
+    public void atualizarListaProjetos() {
+        List<Projeto> projetos = ProjetoDAO.listaProjeto();
+        atualizarListaProjetos(projetos); 
+    }
+
+    
     public void atualizarListaProjetos(List<Projeto> projetos) {
         centerPanel.removeAll();
 

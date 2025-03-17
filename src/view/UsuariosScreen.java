@@ -12,7 +12,6 @@ import view.popups.PopupCadastrarUsuarios;
 import view.popups.PopupCadastroProjetos;
 import view.popups.PopupDoacao;
 
-
 public class UsuariosScreen extends JFrame {
     private final JPanel centerPanel;
 
@@ -58,17 +57,14 @@ public class UsuariosScreen extends JFrame {
         headerPanel.setBackground(new Color(28, 95, 138));
         headerPanel.setPreferredSize(new Dimension(1000, 60));
 
-        
         ImageIcon casaIcon = new ImageIcon("src/assets/LogoDaCasa40x40.png");
         JLabel casaLabel = new JLabel(casaIcon);
         casaLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         headerPanel.add(casaLabel, BorderLayout.WEST);
 
-        
         JPanel menuPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         menuPanel.setBackground(new Color(28, 95, 138));
 
-        
         JLabel cadastroLabel = new JLabel("Cadastro");
         cadastroLabel.setForeground(Color.WHITE);
         cadastroLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -97,7 +93,7 @@ public class UsuariosScreen extends JFrame {
             }
         });
 
-        // Link para "Projetos"
+        
         JLabel projetosLabel = new JLabel("Projetos");
         projetosLabel.setForeground(Color.WHITE);
         projetosLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -120,7 +116,7 @@ public class UsuariosScreen extends JFrame {
         usuariosLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                dispose(); // Fecha a tela atual
+                dispose(); 
                 UsuariosScreen usuariosScreen = new UsuariosScreen(); 
                 usuariosScreen.setVisible(true);
             }
@@ -129,13 +125,12 @@ public class UsuariosScreen extends JFrame {
         menuPanel.add(cadastroLabel);
         menuPanel.add(projetosLabel);
         menuPanel.add(usuariosLabel);
-        
+
         JButton doacaoButton = criarBotaoDoacao();
         menuPanel.add(doacaoButton);
 
         headerPanel.add(menuPanel, BorderLayout.CENTER);
 
-        
         ImageIcon usuarioIcon = new ImageIcon("src/assets/LogoDeUsuario40x40.png");
         JLabel usuarioLabel = new JLabel(usuarioIcon);
         usuarioLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
@@ -237,7 +232,7 @@ public class UsuariosScreen extends JFrame {
 
     private JButton criarBotaoDoacao() {
         JButton doacaoButton = new JButton("Doar");
-        doacaoButton.setBackground(new Color(255, 87, 34)); // Cor destacada (laranja)
+        doacaoButton.setBackground(new Color(255, 87, 34)); 
         doacaoButton.setForeground(Color.WHITE);
         doacaoButton.setFont(new Font("Arial", Font.BOLD, 14));
         doacaoButton.setFocusPainted(false);
@@ -245,13 +240,13 @@ public class UsuariosScreen extends JFrame {
         doacaoButton.setPreferredSize(new Dimension(100, 30));
 
         doacaoButton.addActionListener(e -> {
-            PopupDoacao popupDoacao = new PopupDoacao(this);
+            Frame parentFrame = (Frame) SwingUtilities.getWindowAncestor(this); 
+            PopupDoacao popupDoacao = new PopupDoacao(parentFrame, this::atualizarListaProjetos); 
             popupDoacao.setVisible(true);
         });
 
-    return doacaoButton;
-}
-
+        return doacaoButton;
+    }
 
     private JPanel criarUsuarioPanel(Usuario usuario) {
         JPanel usuarioPanel = new JPanel(new BorderLayout());
@@ -275,8 +270,6 @@ public class UsuariosScreen extends JFrame {
             PopupAlterarUsuario popup = new PopupAlterarUsuario(this, usuario);
             popup.setVisible(true);
         });
-        
-        
 
         excluirButton.addActionListener(e -> {
             int confirmacao = JOptionPane.showConfirmDialog(
@@ -320,6 +313,11 @@ public class UsuariosScreen extends JFrame {
         centerPanel.add(usuariosPanel);
         centerPanel.revalidate();
         centerPanel.repaint();
+    }
+
+    public void atualizarListaProjetos() {
+        // Lógica para atualizar a lista de projetos
+        System.out.println("Lista de projetos atualizada!");
     }
 
     public void redirecionarParaProjetosScreen() {

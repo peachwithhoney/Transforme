@@ -6,18 +6,18 @@ public class Doacao {
     private int id;
     private double valor;
     private Date data;
-    private int idUsuario;
-    private int idProjeto;
+    private int id_usuario;
+    private int id_projeto;
 
     public Doacao() {
     }
 
-    public Doacao(int id, double valor, Date data, int idUsuario, int idProjeto) {
+    public Doacao(int id, double valor, Date data, int id_usuario, int id_projeto) {
         this.id = id;
         this.valor = valor;
         this.data = data;
-        this.idUsuario = idUsuario;
-        this.idProjeto = idProjeto;
+        this.id_usuario = id_usuario;
+        this.id_projeto = id_projeto;
     }
 
     public int getId() {
@@ -45,18 +45,18 @@ public class Doacao {
     }
 
     public int getIdUsuario() {
-        return idUsuario;
+        return id_usuario;
     }
 
-    public void setIdUsuario(int idUsuario) {
-        this.idUsuario = idUsuario;
+    public void setIdUsuario(int id_usuario) {
+        this.id_usuario = id_usuario;
     }
 
     public int getIdProjeto() {
-        return idProjeto;
+        return id_projeto;
     }
 
-    public void setIdProjeto(int idProjeto) {
-        this.idProjeto = idProjeto;
+    public void setIdProjeto(int id_projeto) {
+        this.id_projeto = id_projeto;
     }
 }

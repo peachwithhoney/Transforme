@@ -97,14 +97,6 @@ public class Projeto {
     }
 
     @Override
-    public String toString() {
-        return "Projeto{" +
-                "id=" + id +
-                ", nome='" + nome + '\'' +
-                ", descricao='" + descricao + '\'' +
-                ", metaFinanceira=" + metaFinanceira +
-                ", arrecadacao=" + arrecadacao +
-                ", dataCriacao=" + dataCriacao +
-                '}';
-    }
-}
+public String toString() {
+    return String.format("%s (Meta: R$ %.2f)", nome, metaFinanceira);
+}}

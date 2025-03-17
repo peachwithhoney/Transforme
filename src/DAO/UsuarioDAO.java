@@ -11,7 +11,7 @@ public class UsuarioDAO {
 
     private static final Logger logger = Logger.getLogger(UsuarioDAO.class.getName());
 
-    // Inserir um novo usuário
+    
     public static void inserirUsuario(Usuario usuario) {
         if (usuario.getNome() == null || usuario.getNome().trim().isEmpty()) {
             logger.warning("Erro: O campo 'nome' é obrigatório.");
@@ -49,7 +49,7 @@ public class UsuarioDAO {
         }
     }
 
-    // Consultar um usuário por ID
+    
     public static Usuario consultarUsuario(int id) {
         String sql = "SELECT * FROM usuario WHERE id = ?";
         try (Connection conexao = Conexao.conectar();
@@ -74,7 +74,7 @@ public class UsuarioDAO {
         return null;
     }
 
-    // Listar todos os usuários
+    
     public static List<Usuario> listarUsuarios() {
         List<Usuario> listaUsuarios = new ArrayList<>();
         String sql = "SELECT * FROM usuario";
@@ -96,7 +96,7 @@ public class UsuarioDAO {
         return listaUsuarios;
     }
 
-    // Filtrar usuários por nome e/ou email
+    
     public static List<Usuario> filtrarUsuarios(String nome, String email) {
         List<Usuario> listaUsuarios = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT * FROM usuario WHERE 1=1");
@@ -135,7 +135,7 @@ public class UsuarioDAO {
         return listaUsuarios;
     }
 
-    // Atualizar um usuário
+    
     public static void atualizarUsuario(Usuario usuario) {
         if (usuario.getNome() == null || usuario.getNome().trim().isEmpty()) {
             logger.warning("Erro: O campo 'nome' é obrigatório.");
@@ -170,7 +170,7 @@ public class UsuarioDAO {
         }
     }
 
-    // Deletar um usuário por ID
+    
     public static void deletarUsuario(int id) {
         String sql = "DELETE FROM usuario WHERE id = ?";
         try (Connection conexao = Conexao.conectar();
@@ -189,7 +189,7 @@ public class UsuarioDAO {
         }
     }
 
-    // Autenticar um usuário por email e senha
+   
     public static Usuario autenticarUsuario(String email, String senha) {
         String sql = "SELECT * FROM usuario WHERE email = ? AND senha = ?";
         try (Connection conexao = Conexao.conectar();

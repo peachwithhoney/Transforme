@@ -7,7 +7,6 @@ import java.sql.SQLException;
 
 public class Conexao {
 
-    // Método para conectar ao banco de dados
     public static Connection conectar() {
         Connection conexao = null;
         try {

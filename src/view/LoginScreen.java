@@ -1,6 +1,5 @@
 package view;
 
-import DAO.UsuarioDAO;
 import classes.Usuario;
 import java.awt.*;
 import javax.swing.*;
@@ -8,17 +7,15 @@ import javax.swing.*;
 public class LoginScreen extends JFrame {
 
     public LoginScreen() {
-        // Configurações da janela
+        
         setTitle("Transforme+ - Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 450);
         setLocationRelativeTo(null);
 
-        // Painel principal com BorderLayout
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
 
-        // Painel esquerdo para o logo
         JPanel logoPanel = new JPanel();
         logoPanel.setBackground(Color.WHITE);
         logoPanel.setPreferredSize(new Dimension(500, 450));
@@ -27,20 +24,17 @@ public class LoginScreen extends JFrame {
         JLabel logoLabel = new JLabel(logoIcon);
         logoPanel.add(logoLabel);
 
-        // Painel direito para o formulário de login
         JPanel loginPanel = new JPanel();
         loginPanel.setLayout(new BoxLayout(loginPanel, BoxLayout.Y_AXIS));
         loginPanel.setBackground(new Color(39, 164, 242));
         loginPanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
 
-        // Título do painel de login
         JLabel titleLabel = new JLabel("Transforme+");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         loginPanel.add(titleLabel);
         loginPanel.add(Box.createVerticalStrut(20));
 
-        // Campo de email
         JLabel emailLabel = new JLabel("Email");
         emailLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         loginPanel.add(emailLabel);
@@ -49,7 +43,6 @@ public class LoginScreen extends JFrame {
         loginPanel.add(emailField);
         loginPanel.add(Box.createVerticalStrut(10));
 
-        // Campo de senha
         JLabel passwordLabel = new JLabel("Senha");
         passwordLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         loginPanel.add(passwordLabel);
@@ -58,20 +51,17 @@ public class LoginScreen extends JFrame {
         loginPanel.add(passwordField);
         loginPanel.add(Box.createVerticalStrut(10));
 
-        // Checkbox "Lembrar-me"
         JCheckBox rememberMe = new JCheckBox("Lembrar-me");
         rememberMe.setAlignmentX(Component.LEFT_ALIGNMENT);
         loginPanel.add(rememberMe);
         loginPanel.add(Box.createVerticalStrut(10));
 
-        // Link "Esqueci a senha"
         JLabel forgotPassword = new JLabel("Esqueci a senha");
         forgotPassword.setForeground(Color.BLUE);
         forgotPassword.setAlignmentX(Component.LEFT_ALIGNMENT);
         loginPanel.add(forgotPassword);
         loginPanel.add(Box.createVerticalStrut(20));
 
-        // Botão "Entrar"
         JButton loginButton = new JButton("Entrar");
         loginButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         loginButton.setBackground(new Color(0, 120, 215));
@@ -80,41 +70,37 @@ public class LoginScreen extends JFrame {
         loginButton.setPreferredSize(new Dimension(250, 40));
         loginButton.setMaximumSize(new Dimension(250, 40));
 
-        // Adiciona ação ao botão de login
         loginButton.addActionListener(e -> {
             String email = emailField.getText();
             String senha = new String(passwordField.getPassword());
             
-            // Autentica o usuário
-            Usuario usuario = UsuarioDAO.autenticarUsuario(email, senha);
+            Usuario usuario = Usuario.loginUsuario(email, senha);
+
      
             if (usuario != null) {
                 JOptionPane.showMessageDialog(this, "Login realizado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                 
                 dispose();
-                
+
                 ProjetosScreen projetosScreen = new ProjetosScreen();
                 projetosScreen.setVisible(true);
             } else {
-            	System.out.println("Testeeee");
+            	System.out.println("Erro no login, usuário ou senha incorretos");
                 JOptionPane.showMessageDialog(this, "Email ou senha incorretos.", "Erro", JOptionPane.ERROR_MESSAGE);
             }
         });
 
         loginPanel.add(loginButton);
 
-        // Rodapé
         JLabel footerLabel = new JLabel("Transforme+ - Todos os direitos reservados");
         footerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         footerLabel.setFont(new Font("Arial", Font.PLAIN, 12));
         loginPanel.add(Box.createVerticalStrut(20));
         loginPanel.add(footerLabel);
 
-        // Adiciona os painéis ao painel principal
         mainPanel.add(logoPanel, BorderLayout.WEST);
         mainPanel.add(loginPanel, BorderLayout.CENTER);
 
-        // Adiciona o painel principal à janela
         add(mainPanel);
     }
 

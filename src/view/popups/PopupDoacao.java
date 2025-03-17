@@ -7,6 +7,7 @@ import classes.Projeto;
 import classes.Usuario;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import javax.swing.*;
@@ -15,9 +16,12 @@ public class PopupDoacao extends JDialog {
     private final JComboBox<Projeto> comboProjetos;
     private final JTextField valorField;
     private final JButton confirmarButton, cancelarButton;
+    private final Runnable onDoacaoSuccess; 
 
-    public PopupDoacao(Frame parent) {
+    public PopupDoacao(Frame parent, Runnable onDoacaoSuccess) {
         super(parent, "Registrar Doação", true);
+        this.onDoacaoSuccess = onDoacaoSuccess; 
+        
         setSize(400, 250);
         setLocationRelativeTo(parent);
         setLayout(new BorderLayout());
@@ -51,8 +55,10 @@ public class PopupDoacao extends JDialog {
 
     private void carregarProjetos() {
         List<Projeto> projetos = ProjetoDAO.listaProjeto();
-        for (Projeto projeto : projetos) {
-            comboProjetos.addItem(projeto);
+        if (projetos != null) {
+            for (Projeto projeto : projetos) {
+                comboProjetos.addItem(projeto);
+            }
         }
     }
 
@@ -70,25 +76,32 @@ public class PopupDoacao extends JDialog {
         }
 
         try {
-            double valor = Double.parseDouble(valorField.getText());
-            if (valor <= 0) {
+            BigDecimal valor = new BigDecimal(valorField.getText().trim());
+            if (valor.compareTo(BigDecimal.ZERO) <= 0) {
                 JOptionPane.showMessageDialog(this, "O valor deve ser positivo!", "Erro", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            double restante = projetoSelecionado.getMetaFinanceira().doubleValue() - 
-                        projetoSelecionado.getArrecadacao().doubleValue();
+            BigDecimal restante = projetoSelecionado.getMetaFinanceira().subtract(projetoSelecionado.getArrecadacao());
 
-            if (valor > restante) {
+            if (valor.compareTo(restante) > 0) {
                 JOptionPane.showMessageDialog(this, "A doação excede o valor necessário!", "Erro", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            Doacao novaDoacao = new Doacao(0, valor, new Date(), usuarioLogado.getId(), projetoSelecionado.getId());
-            DoacaoDAO.registrarDoacao(novaDoacao);
+            Doacao novaDoacao = new Doacao(0, valor.doubleValue(), new Date(), usuarioLogado.getId(), projetoSelecionado.getId());
+            boolean sucesso = DoacaoDAO.registrarDoacao(novaDoacao);
 
-            JOptionPane.showMessageDialog(this, "Doação registrada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-            dispose();
+            if (sucesso) {
+                JOptionPane.showMessageDialog(this, "Doação registrada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                projetoSelecionado.setArrecadacao(projetoSelecionado.getArrecadacao().add(valor));
+            
+                if (onDoacaoSuccess != null) {
+                    onDoacaoSuccess.run();
+                }
+            
+                dispose();
+            }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Digite um valor válido!", "Erro", JOptionPane.ERROR_MESSAGE);
         }

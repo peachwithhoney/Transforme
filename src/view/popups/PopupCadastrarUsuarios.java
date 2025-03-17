@@ -1,13 +1,8 @@
 package view.popups;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
-import java.awt.event.ActionEvent;
-
-import java.awt.event.ActionListener;
-
-import static javax.swing.JOptionPane.*;
+import javax.swing.*;
 
 public class PopupCadastrarUsuarios extends JDialog {
 
@@ -31,30 +26,30 @@ public class PopupCadastrarUsuarios extends JDialog {
         panel.add(nomeField);
         panel.add(Box.createVerticalStrut(10));
 
-        addField(popupPanel, "Email:");
+        addField(panel, "Email:");
         JTextField emailField = new JTextField(20);
         emailField.setMaximumSize(FIELD_SIZE);
-        popupPanel.add(emailField);
-        popupPanel.add(Box.createVerticalStrut(10));
+        panel.add(emailField);
+        panel.add(Box.createVerticalStrut(10));
 
-        addField(popupPanel, "Senha:");
+        addField(panel, "Senha:");
         JPasswordField senhaField = new JPasswordField(20);
         senhaField.setMaximumSize(FIELD_SIZE);
-        popupPanel.add(senhaField);
-        popupPanel.add(Box.createVerticalStrut(10));
+        panel.add(senhaField);
+        panel.add(Box.createVerticalStrut(10));
 
-        addField(popupPanel, "Confirmar Senha:");
+        addField(panel, "Confirmar Senha:");
         JPasswordField confirmarSenhaField = new JPasswordField(20);
         confirmarSenhaField.setMaximumSize(FIELD_SIZE);
-        popupPanel.add(confirmarSenhaField);
-        popupPanel.add(Box.createVerticalStrut(20));
+        panel.add(confirmarSenhaField);
+        panel.add(Box.createVerticalStrut(20));
 
         JButton cadastrarButton = createButton("Cadastrar", PRIMARY_COLOR);
         JButton cancelarButton = createButton("Cancelar", Color.LIGHT_GRAY);
 
         cadastrarButton.addActionListener(e -> {
             String nome = nomeField.getText().trim();
-            String email = nomeField.getText().trim();
+            String email = emailField.getText().trim(); 
             char[] senha = senhaField.getPassword();
             char[] confirmarSenha = confirmarSenhaField.getPassword();
 
@@ -79,17 +74,13 @@ public class PopupCadastrarUsuarios extends JDialog {
         buttonPanel.add(cadastrarButton);
         buttonPanel.add(cancelarButton);
 
-        add(popupPanel, BorderLayout.CENTER);
+        add(panel, BorderLayout.CENTER); 
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
     private void addField(JPanel panel, String label) {
         JLabel jLabel = new JLabel(label);
-        JTextField field = new JTextField(20);
-        field.setMaximumSize(FIELD_SIZE);
         panel.add(jLabel);
-        panel.add(field);
-        panel.add(Box.createVerticalStrut(10));
     }
 
     private JButton createButton(String text, Color color) {

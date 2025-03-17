@@ -2,7 +2,7 @@ package classes;
 
 import DAO.ProjetoDAO;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class Projeto {
     private int id;
@@ -10,52 +10,43 @@ public class Projeto {
     private String descricao;
     private BigDecimal metaFinanceira;
     private BigDecimal arrecadacao;
-    private String imagem;
-    private Date dataCriacao;
+    private LocalDateTime dataCriacao;
 
+    
     public Projeto() {
+        this.arrecadacao = BigDecimal.ZERO; 
+        this.dataCriacao = LocalDateTime.now(); 
     }
 
-    public Projeto(int id, String nome, String descricao, BigDecimal metaFinanceira, Date dataCriacao) {
+    
+    public Projeto(int id, String nome, String descricao, BigDecimal metaFinanceira, LocalDateTime dataCriacao) {
+        this.id = id;
         this.nome = nome;
         this.descricao = descricao;
         this.metaFinanceira = metaFinanceira;
-        this.dataCriacao = dataCriacao;
+        this.dataCriacao = dataCriacao != null ? dataCriacao : LocalDateTime.now(); 
+        this.arrecadacao = BigDecimal.ZERO; 
     }
+
     
-    public Projeto(int id, String nome, String descricao, BigDecimal metaFinanceira, String imagem, Date dataCriacao) {
-        this.nome = nome;
-        this.descricao = descricao;
-        this.metaFinanceira = metaFinanceira;
-        this.imagem = imagem;
-        this.dataCriacao = dataCriacao;
-    }
-    
-    public Projeto(int id, String nome, String descricao, BigDecimal metaFinanceira, BigDecimal arrecadacao, String imagem, Date dataCriacao) {
-    	this.id = id;
+    public Projeto(int id, String nome, String descricao, BigDecimal metaFinanceira, BigDecimal arrecadacao, LocalDateTime dataCriacao) {
+        this.id = id;
         this.nome = nome;
         this.descricao = descricao;
         this.metaFinanceira = metaFinanceira;
         this.arrecadacao = arrecadacao;
-        this.imagem = imagem;
-        this.dataCriacao = dataCriacao;
+        this.dataCriacao = dataCriacao != null ? dataCriacao : LocalDateTime.now(); 
     }
+
     
     public BigDecimal totalArrecadado(int meses) {
-    	BigDecimal total_arrecadado = ProjetoDAO.calculaTotalArrecadado(this, meses);
-    	
-    	return total_arrecadado;
+        return ProjetoDAO.calculaTotalArrecadado(this, meses);
     }
+
     
     public String metaFinanceira() {
-    	String status;
-    	
-    	
-    	status = ("Projeto " + this.getNome() + "\nTotal Arrecadado/Meta\nR$" + this.getArrecadacao() +" / R$" + this.getMetaFinanceira());
-    	
-    	return status;
+        return "Projeto " + this.getNome() + "\nTotal Arrecadado/Meta\nR$ " + this.getArrecadacao() + " / R$ " + this.getMetaFinanceira();
     }
-    
 
     public int getId() {
         return id;
@@ -97,19 +88,23 @@ public class Projeto {
         this.arrecadacao = arrecadacao;
     }
 
-    public String getImagem() {
-        return imagem;
-    }
-
-    public void setImagem(String imagem) {
-        this.imagem = imagem;
-    }
-
-    public Date getDataCriacao() {
+    public LocalDateTime getDataCriacao() {
         return dataCriacao;
     }
 
-    public void setDataCriacao(Date dataCriacao) {
-        this.dataCriacao = dataCriacao;
+    public void setDataCriacao(LocalDateTime dataCriacao) {
+        this.dataCriacao = dataCriacao != null ? dataCriacao : LocalDateTime.now();
+    }
+
+    @Override
+    public String toString() {
+        return "Projeto{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                ", descricao='" + descricao + '\'' +
+                ", metaFinanceira=" + metaFinanceira +
+                ", arrecadacao=" + arrecadacao +
+                ", dataCriacao=" + dataCriacao +
+                '}';
     }
 }

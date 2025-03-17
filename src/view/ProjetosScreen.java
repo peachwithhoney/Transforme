@@ -11,6 +11,7 @@ import view.popups.PopupCadastrarUsuarios;
 import view.popups.PopupCadastroProjetos;
 
 public class ProjetosScreen extends JFrame {
+    private final JPanel centerPanel;
 
     public ProjetosScreen() {
         setTitle("Transforme+ - Projetos");
@@ -24,7 +25,7 @@ public class ProjetosScreen extends JFrame {
         JPanel headerPanel = criarHeader();
         mainPanel.add(headerPanel, BorderLayout.NORTH);
 
-        JPanel centerPanel = new JPanel();
+        centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.setBackground(Color.WHITE);
         centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -49,23 +50,22 @@ public class ProjetosScreen extends JFrame {
         add(mainPanel);
     }
 
-    // Método para criar o header
     private JPanel criarHeader() {
         JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(new Color(28, 95, 138)); 
-        headerPanel.setPreferredSize(new Dimension(1000, 60)); 
+        headerPanel.setBackground(new Color(28, 95, 138));
+        headerPanel.setPreferredSize(new Dimension(1000, 60));
 
-        // Ícone de casa no canto esquerdo
-        ImageIcon casaIcon = new ImageIcon("src/assets/LogoDaCasa40x40.png"); 
+        
+        ImageIcon casaIcon = new ImageIcon("src/assets/LogoDaCasa40x40.png");
         JLabel casaLabel = new JLabel(casaIcon);
-        casaLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); 
+        casaLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         headerPanel.add(casaLabel, BorderLayout.WEST);
 
-        // Texto "Cadastro" e "Projetos" no centro com dropdown
+        
         JPanel menuPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        menuPanel.setBackground(new Color(28, 95, 138)); 
+        menuPanel.setBackground(new Color(28, 95, 138));
 
-        // Dropdown para "Cadastro"
+        
         JLabel cadastroLabel = new JLabel("Cadastro");
         cadastroLabel.setForeground(Color.WHITE);
         cadastroLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -74,13 +74,13 @@ public class ProjetosScreen extends JFrame {
         JMenuItem usuariosItem = new JMenuItem("Usuários");
         JMenuItem projetosItem = new JMenuItem("Projetos");
 
-        // Abrir popup de cadastro de usuários ao clicar em "Usuários"
+        
         usuariosItem.addActionListener((actionEvent) -> {
             PopupCadastrarUsuarios popupUsuarios = new PopupCadastrarUsuarios(this);
             popupUsuarios.setVisible(true);
         });
 
-        // Abrir popup de cadastro de projetos ao clicar em "Projetos"
+        
         projetosItem.addActionListener((actionEvent) -> {
             PopupCadastroProjetos popupProjetos = new PopupCadastroProjetos(this);
             popupProjetos.setVisible(true);
@@ -96,38 +96,50 @@ public class ProjetosScreen extends JFrame {
             }
         });
 
-        // Link para "Projetos"
+        
         JLabel projetosLabel = new JLabel("Projetos");
         projetosLabel.setForeground(Color.WHITE);
         projetosLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        projetosLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); 
+        projetosLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         projetosLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                
                 dispose();
-                
                 ProjetosScreen projetosScreen = new ProjetosScreen();
                 projetosScreen.setVisible(true);
             }
         });
 
+        
+        JLabel usuariosLabel = new JLabel("Usuários");
+        usuariosLabel.setForeground(Color.WHITE);
+        usuariosLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        usuariosLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        usuariosLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                dispose(); 
+                UsuariosScreen usuariosScreen = new UsuariosScreen(); 
+                usuariosScreen.setVisible(true);
+            }
+        });
+
+        
         menuPanel.add(cadastroLabel);
         menuPanel.add(projetosLabel);
+        menuPanel.add(usuariosLabel);
         headerPanel.add(menuPanel, BorderLayout.CENTER);
 
-        // Ícone de usuário no canto direito com dropdown para logout
-        ImageIcon usuarioIcon = new ImageIcon("src/assets/LogoDeUsuario40x40.png"); 
+        ImageIcon usuarioIcon = new ImageIcon("src/assets/LogoDeUsuario40x40.png");
         JLabel usuarioLabel = new JLabel(usuarioIcon);
-        usuarioLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); 
+        usuarioLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
         JPopupMenu logoutMenu = new JPopupMenu();
         JMenuItem logoutItem = new JMenuItem("Logout");
         logoutItem.addActionListener(e -> {
-            // Fecha a tela de projetos
             dispose();
-            // Abre a tela de login
             LoginScreen loginScreen = new LoginScreen();
             loginScreen.setVisible(true);
         });
@@ -145,7 +157,6 @@ public class ProjetosScreen extends JFrame {
         return headerPanel;
     }
 
-    // Método para criar o painel de filtros
     private JPanel criarBalaoFiltros() {
         JPanel filtrosPanel = new JPanel();
         filtrosPanel.setLayout(new BoxLayout(filtrosPanel, BoxLayout.Y_AXIS));
@@ -180,12 +191,10 @@ public class ProjetosScreen extends JFrame {
 
         JButton filtrarButton = new JButton("Filtrar");
         filtrarButton.addActionListener(e -> {
-            // Lógica para filtrar projetos
             String nome = nomeField.getText();
             String descricao = descricaoField.getText();
             String meta = metaField.getText();
 
-            // Chama o método de filtro no DAO 
             List<Projeto> projetosFiltrados = ProjetoDAO.filtrarProjetos(nome, descricao, meta);
             atualizarListaProjetos(projetosFiltrados);
         });
@@ -195,8 +204,8 @@ public class ProjetosScreen extends JFrame {
             nomeField.setText("");
             descricaoField.setText("");
             metaField.setText("");
-            // Recarrega a lista completa de projetos
-            atualizarListaProjetos(ProjetoDAO.listaProjeto());
+            List<Projeto> projetos = ProjetoDAO.listaProjeto();
+            atualizarListaProjetos(projetos);
         });
 
         botoesPanel.add(filtrarButton);
@@ -206,7 +215,6 @@ public class ProjetosScreen extends JFrame {
         return filtrosPanel;
     }
 
-    // Método para criar o painel de projetos
     private JPanel criarBalaoProjetos() {
         JPanel projetosPanel = new JPanel();
         projetosPanel.setLayout(new BoxLayout(projetosPanel, BoxLayout.Y_AXIS));
@@ -219,7 +227,6 @@ public class ProjetosScreen extends JFrame {
         projetosPanel.add(tituloLabel);
         projetosPanel.add(Box.createVerticalStrut(10));
 
-        // Carrega a lista de projetos do banco de dados
         List<Projeto> projetos = ProjetoDAO.listaProjeto();
         for (Projeto projeto : projetos) {
             projetosPanel.add(criarProjetoPanel(projeto));
@@ -229,7 +236,6 @@ public class ProjetosScreen extends JFrame {
         return projetosPanel;
     }
 
-    // Método para criar um painel de projeto individual
     private JPanel criarProjetoPanel(Projeto projeto) {
         JPanel projetoPanel = new JPanel(new BorderLayout());
         projetoPanel.setBackground(Color.WHITE);
@@ -249,7 +255,6 @@ public class ProjetosScreen extends JFrame {
         JButton alterarButton = new JButton("Alterar");
         JButton excluirButton = new JButton("Excluir");
 
-        // Ação do botão "Excluir"
         excluirButton.addActionListener(e -> {
             int confirmacao = JOptionPane.showConfirmDialog(
                 this,
@@ -259,11 +264,9 @@ public class ProjetosScreen extends JFrame {
             );
 
             if (confirmacao == JOptionPane.YES_OPTION) {
-                
+                System.out.println("Tentando excluir projeto com ID: " + projeto.getId());
                 ProjetoDAO.deletarProjeto(projeto.getId());
-                
-                redirecionarParaProjetosScreen();
-                //(ProjetoDAO.listaProjeto());
+                atualizarListaProjetos(ProjetoDAO.listaProjeto());
                 JOptionPane.showMessageDialog(this, "Projeto excluído com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             }
         });
@@ -275,9 +278,7 @@ public class ProjetosScreen extends JFrame {
         return projetoPanel;
     }
 
-    // Lista de projetos exibida
     public void atualizarListaProjetos(List<Projeto> projetos) {
-        JPanel centerPanel = (JPanel) getContentPane().getComponent(1);
         centerPanel.removeAll();
 
         JPanel filtrosPanel = criarBalaoFiltros();
@@ -299,15 +300,8 @@ public class ProjetosScreen extends JFrame {
         centerPanel.repaint();
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            ProjetosScreen projetosScreen = new ProjetosScreen();
-            projetosScreen.setVisible(true);
-        });
-    }
-    
     public void redirecionarParaProjetosScreen() {
-        dispose(); 
+        dispose();
         ProjetosScreen projetosScreen = new ProjetosScreen();
         projetosScreen.setVisible(true);
     }

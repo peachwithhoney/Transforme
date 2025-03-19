@@ -5,6 +5,9 @@ import DAO.ProjetoDAO;
 import classes.Doacao;
 import classes.Projeto;
 import classes.Usuario;
+import exceptions.CampoObrigatorioException;
+import exceptions.ProjetoNaoEncontradoException;
+import exceptions.UsuarioNaoEncontradoException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.math.BigDecimal;
@@ -90,7 +93,7 @@ public class PopupDoacao extends JDialog {
             }
 
             Doacao novaDoacao = new Doacao(0, valor.doubleValue(), new Date(), usuarioLogado.getId(), projetoSelecionado.getId());
-            DoacaoDAO.registrarDoacao(novaDoacao); 
+            DoacaoDAO.registrarDoacao(novaDoacao); // Método pode lançar exceções
 
             JOptionPane.showMessageDialog(this, "Doação registrada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             projetoSelecionado.setArrecadacao(projetoSelecionado.getArrecadacao().add(valor));
@@ -102,6 +105,10 @@ public class PopupDoacao extends JDialog {
             dispose();
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Digite um valor válido!", "Erro", JOptionPane.ERROR_MESSAGE);
+        } catch (CampoObrigatorioException | UsuarioNaoEncontradoException | ProjetoNaoEncontradoException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Erro inesperado: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

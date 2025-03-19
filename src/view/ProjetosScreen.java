@@ -3,6 +3,7 @@ package view;
 import DAO.DoacaoDAO;
 import DAO.ProjetoDAO;
 import classes.Projeto;
+import exceptions.ProjetoNaoEncontradoException; 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -174,7 +175,7 @@ public class ProjetosScreen extends JFrame {
         doacaoButton.setPreferredSize(new Dimension(100, 30));
 
         doacaoButton.addActionListener(e -> {
-            Frame parentFrame = (Frame) SwingUtilities.getWindowAncestor(this);
+            JFrame parentFrame = this;
             PopupDoacao popupDoacao = new PopupDoacao(parentFrame, this::atualizarListaProjetos);
             popupDoacao.setVisible(true);
         });
@@ -265,20 +266,25 @@ public class ProjetosScreen extends JFrame {
         JPanel projetoPanel = new JPanel(new BorderLayout());
         projetoPanel.setBackground(Color.WHITE);
         projetoPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
-    
+
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.setBackground(Color.WHITE);
-    
+
         JLabel nomeLabel = new JLabel(projeto.getNome());
         JLabel descricaoLabel = new JLabel(projeto.getDescricao());
-    
-        
-        double totalArrecadado = DoacaoDAO.getTotalArrecadado(projeto.getId());
+
+        double totalArrecadado = 0;
+        try {
+            totalArrecadado = DoacaoDAO.getTotalArrecadado(projeto.getId());
+        } catch (ProjetoNaoEncontradoException e) {
+            JOptionPane.showMessageDialog(this, "Erro ao buscar doações: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            totalArrecadado = 0; 
+        }
+
         double meta = projeto.getMetaFinanceira().doubleValue();
-    
         JLabel metaLabel = new JLabel(String.format("Meta: R$ %.2f | Arrecadado: R$ %.2f", meta, totalArrecadado));
-    
+
         double percentual = (totalArrecadado / meta) * 100;
         Color corIndicador;
         if (percentual < 50) {
@@ -288,33 +294,33 @@ public class ProjetosScreen extends JFrame {
         } else {
             corIndicador = Color.GREEN;
         }
-    
+
         JLabel indicadorLabel = new JLabel("●");
         indicadorLabel.setFont(new Font("Arial", Font.BOLD, 16));
         indicadorLabel.setForeground(corIndicador);
-    
+
         JPanel metaPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         metaPanel.setBackground(Color.WHITE);
         metaPanel.add(metaLabel);
         metaPanel.add(indicadorLabel);
-    
+
         infoPanel.add(nomeLabel);
         infoPanel.add(descricaoLabel);
         infoPanel.add(metaPanel);
-    
+
         projetoPanel.add(infoPanel, BorderLayout.CENTER);
-    
+
         JPanel acoesPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         acoesPanel.setBackground(Color.WHITE);
-    
+
         JButton alterarButton = new JButton("Alterar");
         JButton excluirButton = new JButton("Excluir");
-    
+
         alterarButton.addActionListener(e -> {
             PopupAlterarProjeto popupAlterarProjeto = new PopupAlterarProjeto(this, projeto);
             popupAlterarProjeto.setVisible(true);
         });
-    
+
         excluirButton.addActionListener(e -> {
             int confirmacao = JOptionPane.showConfirmDialog(
                 this,
@@ -322,28 +328,30 @@ public class ProjetosScreen extends JFrame {
                 "Confirmar Exclusão",
                 JOptionPane.YES_NO_OPTION
             );
-    
+
             if (confirmacao == JOptionPane.YES_OPTION) {
-                ProjetoDAO.deletarProjeto(projeto.getId());
-                atualizarListaProjetos(ProjetoDAO.listaProjeto());
-                JOptionPane.showMessageDialog(this, "Projeto excluído com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                try {
+                    ProjetoDAO.deletarProjeto(projeto.getId());
+                    atualizarListaProjetos(ProjetoDAO.listaProjeto());
+                    JOptionPane.showMessageDialog(this, "Projeto excluído com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                } catch (ProjetoNaoEncontradoException ex) {
+                    JOptionPane.showMessageDialog(this, "Erro ao excluir projeto: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
-    
+
         acoesPanel.add(alterarButton);
         acoesPanel.add(excluirButton);
         projetoPanel.add(acoesPanel, BorderLayout.EAST);
-    
+
         return projetoPanel;
     }
-    
 
     public void atualizarListaProjetos() {
         List<Projeto> projetos = ProjetoDAO.listaProjeto();
         atualizarListaProjetos(projetos); 
     }
 
-    
     public void atualizarListaProjetos(List<Projeto> projetos) {
         centerPanel.removeAll();
 

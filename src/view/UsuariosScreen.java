@@ -2,6 +2,7 @@ package view;
 
 import DAO.UsuarioDAO;
 import classes.Usuario;
+import exceptions.UsuarioNaoEncontradoException;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -93,7 +94,6 @@ public class UsuariosScreen extends JFrame {
             }
         });
 
-        
         JLabel projetosLabel = new JLabel("Projetos");
         projetosLabel.setForeground(Color.WHITE);
         projetosLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -280,9 +280,13 @@ public class UsuariosScreen extends JFrame {
             );
 
             if (confirmacao == JOptionPane.YES_OPTION) {
-                UsuarioDAO.deletarUsuario(usuario.getId());
-                atualizarListaUsuarios(UsuarioDAO.listarUsuarios());
-                JOptionPane.showMessageDialog(this, "Usuário excluído com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                try {
+                    UsuarioDAO.deletarUsuario(usuario.getId());
+                    atualizarListaUsuarios(UsuarioDAO.listarUsuarios());
+                    JOptionPane.showMessageDialog(this, "Usuário excluído com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                } catch (UsuarioNaoEncontradoException ex) {
+                    JOptionPane.showMessageDialog(this, "Erro ao excluir usuário: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
@@ -316,7 +320,7 @@ public class UsuariosScreen extends JFrame {
     }
 
     public void atualizarListaProjetos() {
-        // Lógica para atualizar a lista de projetos
+        
         System.out.println("Lista de projetos atualizada!");
     }
 

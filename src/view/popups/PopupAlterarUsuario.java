@@ -1,13 +1,13 @@
 package view.popups;
 
-import DAO.*;
+import DAO.UsuarioDAO;
 import classes.Usuario;
+import exceptions.CampoObrigatorioException;
+import exceptions.UsuarioNaoEncontradoException;
 import java.awt.*;
 import java.util.Arrays;
 import javax.swing.*;
 import view.UsuariosScreen;
-
-
 
 public class PopupAlterarUsuario extends JDialog {
 
@@ -29,8 +29,8 @@ public class PopupAlterarUsuario extends JDialog {
         setLayout(new BorderLayout());
         getRootPane().setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        if (parent instanceof UsuariosScreen u) {
-            this.usuariosScreen = u;
+        if (parent instanceof UsuariosScreen) {
+            this.usuariosScreen = (UsuariosScreen) parent;
         }
 
         JPanel panel = new JPanel();
@@ -94,29 +94,47 @@ public class PopupAlterarUsuario extends JDialog {
         char[] senha = senhaField.getPassword();
         char[] confirmarSenha = confirmarSenhaField.getPassword();
 
-        if (nome.isEmpty() || email.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Nome e email são obrigatórios!", "Erro", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        try {
+           
+            if (nome.isEmpty()) {
+                throw new CampoObrigatorioException("O campo 'Nome' é obrigatório!");
+            }
+            if (email.isEmpty()) {
+                throw new CampoObrigatorioException("O campo 'Email' é obrigatório!");
+            }
 
-        if (senha.length > 0 && !Arrays.equals(senha, confirmarSenha)) {
-            JOptionPane.showMessageDialog(this, "As senhas não coincidem!", "Erro", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+            
+            if (senha.length > 0 && !Arrays.equals(senha, confirmarSenha)) {
+                JOptionPane.showMessageDialog(this, "As senhas não coincidem!", "Erro", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-        usuario.setNome(nome);
-        usuario.setEmail(email);
-        if (senha.length > 0) {
-            usuario.setSenha(new String(senha));
-        }
+            
+            usuario.setNome(nome);
+            usuario.setEmail(email);
+            if (senha.length > 0) {
+                usuario.setSenha(new String(senha));
+            }
 
-        UsuarioDAO.atualizarUsuario(usuario);
+            
+            UsuarioDAO.atualizarUsuario(usuario);
 
-        JOptionPane.showMessageDialog(this, "Usuário atualizado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-        dispose();
+           
+            JOptionPane.showMessageDialog(this, "Usuário atualizado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
 
-        if (usuariosScreen != null) {
-            usuariosScreen.atualizarListaUsuarios(UsuarioDAO.listarUsuarios());
+            
+            dispose();
+
+            
+            if (usuariosScreen != null) {
+                usuariosScreen.atualizarListaUsuarios(UsuarioDAO.listarUsuarios());
+            }
+        } catch (CampoObrigatorioException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        } catch (UsuarioNaoEncontradoException ex) {
+            JOptionPane.showMessageDialog(this, "Erro ao atualizar usuário: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Erro inesperado: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

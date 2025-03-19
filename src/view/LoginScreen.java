@@ -1,6 +1,8 @@
 package view;
 
 import classes.Usuario;
+import exceptions.SenhaInvalidaException;
+import exceptions.UsuarioNaoEncontradoException;
 import java.awt.*;
 import javax.swing.*;
 
@@ -70,23 +72,32 @@ public class LoginScreen extends JFrame {
         loginButton.setPreferredSize(new Dimension(250, 40));
         loginButton.setMaximumSize(new Dimension(250, 40));
 
+        
         loginButton.addActionListener(e -> {
             String email = emailField.getText();
             String senha = new String(passwordField.getPassword());
-            
-            Usuario usuario = Usuario.loginUsuario(email, senha);
 
-     
-            if (usuario != null) {
-                JOptionPane.showMessageDialog(this, "Login realizado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+            try {
                 
-                dispose();
+                Usuario usuario = Usuario.loginUsuario(email, senha);
 
-                ProjetosScreen projetosScreen = new ProjetosScreen();
-                projetosScreen.setVisible(true);
-            } else {
-            	System.out.println("Erro no login, usuário ou senha incorretos");
-                JOptionPane.showMessageDialog(this, "Email ou senha incorretos.", "Erro", JOptionPane.ERROR_MESSAGE);
+                if (usuario != null) {
+                    JOptionPane.showMessageDialog(this, "Login realizado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                    dispose(); 
+
+                    
+                    ProjetosScreen projetosScreen = new ProjetosScreen();
+                    projetosScreen.setVisible(true);
+                }
+            } catch (UsuarioNaoEncontradoException ex) {
+                
+                JOptionPane.showMessageDialog(this, "Usuário não encontrado. Verifique o email.", "Erro", JOptionPane.ERROR_MESSAGE);
+            } catch (SenhaInvalidaException ex) {
+                
+                JOptionPane.showMessageDialog(this, "Senha incorreta. Tente novamente.", "Erro", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                
+                JOptionPane.showMessageDialog(this, "Erro inesperado: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
             }
         });
 

@@ -1,6 +1,8 @@
 package classes;
 
 import DAO.UsuarioDAO;
+import exceptions.SenhaInvalidaException;
+import exceptions.UsuarioNaoEncontradoException;
 
 public class Usuario {
     private int id;
@@ -30,7 +32,8 @@ public class Usuario {
         this.logado = false;  
     }
 
-    public static Usuario loginUsuario(String email, String senha) {
+    public static Usuario loginUsuario(String email, String senha) 
+            throws UsuarioNaoEncontradoException, SenhaInvalidaException {
         Usuario usuarioAutenticado = UsuarioDAO.autenticarUsuario(email, senha);
 
         if (usuarioAutenticado != null) {
@@ -54,9 +57,11 @@ public class Usuario {
         }
     }
 
+
     public static Usuario getUsuarioLogado() {
         return usuarioLogado;
     }
+
 
     public int getId() {
         return id;
@@ -96,10 +101,5 @@ public class Usuario {
 
     public void setLogado(boolean logado) {
         this.logado = logado;
-    }
-
-    @Override
-    public String toString() {
-        return "Informações do usuário:\nid: " + id + "\nnome: " + nome + "\nemail: " + email;
     }
 }

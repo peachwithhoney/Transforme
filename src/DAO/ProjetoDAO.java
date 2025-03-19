@@ -1,6 +1,8 @@
 package DAO;
 
 import classes.Projeto;
+import exceptions.CampoObrigatorioException;
+import exceptions.ProjetoNaoEncontradoException;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
@@ -8,29 +10,29 @@ import java.util.List;
 
 public class ProjetoDAO {
 
-    public static void inserirProjeto(Projeto projeto) {
+    
+    public static void inserirProjeto(Projeto projeto) throws CampoObrigatorioException {
+      
         if (projeto.getNome() == null || projeto.getNome().trim().isEmpty()) {
-            System.err.println("Erro: O campo 'nome' é obrigatório.");
-            return;
+            throw new CampoObrigatorioException("O campo 'nome' é obrigatório.");
         }
         if (projeto.getMetaFinanceira() == null || projeto.getMetaFinanceira().compareTo(BigDecimal.ZERO) <= 0) {
-            System.err.println("Erro: O campo 'metaFinanceira' é obrigatório e deve ser maior que zero.");
-            return;
+            throw new CampoObrigatorioException("O campo 'metaFinanceira' é obrigatório e deve ser maior que zero.");
         }
 
         String sql = "INSERT INTO projeto (nome, descricao, meta_financeira, arrecadacao, data_criacao) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conexao = Conexao.conectar();
+        try (Connection conexao = Conexao.getInstancia().getConexao();
              PreparedStatement stmt = conexao.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, projeto.getNome());
             stmt.setString(2, projeto.getDescricao());
             stmt.setBigDecimal(3, projeto.getMetaFinanceira());
             stmt.setBigDecimal(4, projeto.getArrecadacao());
-            stmt.setTimestamp(5, Timestamp.valueOf(projeto.getDataCriacao())); 
+            stmt.setTimestamp(5, Timestamp.valueOf(projeto.getDataCriacao()));
 
             stmt.executeUpdate();
 
-            
+            // Recupera o ID gerado
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     projeto.setId(generatedKeys.getInt(1));
@@ -39,14 +41,14 @@ public class ProjetoDAO {
 
             System.out.println("Projeto inserido com sucesso!");
         } catch (SQLException e) {
-            System.err.println("Erro 500: Erro ao inserir projeto: " + e.getMessage());
+            throw new RuntimeException("Erro ao inserir projeto: " + e.getMessage(), e);
         }
     }
 
     
-    public static Projeto consultarProjeto(int id) {
+    public static Projeto consultarProjeto(int id) throws ProjetoNaoEncontradoException {
         String sql = "SELECT * FROM projeto WHERE id = ?";
-        try (Connection conexao = Conexao.conectar();
+        try (Connection conexao = Conexao.getInstancia().getConexao();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
@@ -58,22 +60,22 @@ public class ProjetoDAO {
                         rs.getString("descricao"),
                         rs.getBigDecimal("meta_financeira"),
                         rs.getBigDecimal("arrecadacao"),
-                        rs.getTimestamp("data_criacao").toLocalDateTime() 
+                        rs.getTimestamp("data_criacao").toLocalDateTime()
                     );
                 } else {
-                    System.out.println("Projeto não encontrado.");
+                    throw new ProjetoNaoEncontradoException("Projeto com ID " + id + " não encontrado.");
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Erro 500: Erro ao consultar projeto: " + e.getMessage());
+            throw new RuntimeException("Erro ao consultar projeto: " + e.getMessage(), e);
         }
-        return null;
     }
 
+   
     public static List<Projeto> listaProjeto() {
         List<Projeto> listaProjetos = new ArrayList<>();
         String sql = "SELECT id, nome, descricao, meta_financeira, arrecadacao, data_criacao FROM projeto";
-        try (Connection conexao = Conexao.conectar();
+        try (Connection conexao = Conexao.getInstancia().getConexao();
              Statement stmt = conexao.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
@@ -88,11 +90,12 @@ public class ProjetoDAO {
                 ));
             }
         } catch (SQLException e) {
-            System.err.println("Erro 500: Erro ao listar projetos: " + e.getMessage());
+            throw new RuntimeException("Erro ao listar projetos: " + e.getMessage(), e);
         }
         return listaProjetos;
     }
 
+    
     public static List<Projeto> filtrarProjetos(String nome, String descricao, String meta) {
         List<Projeto> listaProjetos = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT id, nome, descricao, meta_financeira, arrecadacao, data_criacao FROM projeto WHERE 1=1");
@@ -107,7 +110,7 @@ public class ProjetoDAO {
             sql.append(" AND meta_financeira >= ?");
         }
 
-        try (Connection conexao = Conexao.conectar();
+        try (Connection conexao = Conexao.getInstancia().getConexao();
              PreparedStatement stmt = conexao.prepareStatement(sql.toString())) {
 
             int index = 1;
@@ -130,55 +133,54 @@ public class ProjetoDAO {
                         rs.getString("descricao"),
                         rs.getBigDecimal("meta_financeira"),
                         rs.getBigDecimal("arrecadacao"),
-                        rs.getTimestamp("data_criacao").toLocalDateTime() 
+                        rs.getTimestamp("data_criacao").toLocalDateTime()
                     ));
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Erro 500: Erro ao filtrar projetos: " + e.getMessage());
+            throw new RuntimeException("Erro ao filtrar projetos: " + e.getMessage(), e);
         }
 
         return listaProjetos;
     }
 
-    public static void atualizarProjeto(Projeto projeto) {
+    
+    public static void atualizarProjeto(Projeto projeto) throws CampoObrigatorioException, ProjetoNaoEncontradoException {
+        
         if (projeto.getNome() == null || projeto.getNome().trim().isEmpty()) {
-            System.err.println("Erro: O campo 'nome' é obrigatório.");
-            return;
+            throw new CampoObrigatorioException("O campo 'nome' é obrigatório.");
         }
         if (projeto.getMetaFinanceira() == null || projeto.getMetaFinanceira().compareTo(BigDecimal.ZERO) <= 0) {
-            System.err.println("Erro: O campo 'metaFinanceira' é obrigatório e deve ser maior que zero.");
-            return;
+            throw new CampoObrigatorioException("O campo 'metaFinanceira' é obrigatório e deve ser maior que zero.");
         }
 
         String sql = "UPDATE projeto SET nome = ?, descricao = ?, meta_financeira = ?, arrecadacao = ?, data_criacao = ? WHERE id = ?";
-        try (Connection conexao = Conexao.conectar();
+        try (Connection conexao = Conexao.getInstancia().getConexao();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setString(1, projeto.getNome());
             stmt.setString(2, projeto.getDescricao());
             stmt.setBigDecimal(3, projeto.getMetaFinanceira());
             stmt.setBigDecimal(4, projeto.getArrecadacao());
-            stmt.setTimestamp(5, Timestamp.valueOf(projeto.getDataCriacao())); 
+            stmt.setTimestamp(5, Timestamp.valueOf(projeto.getDataCriacao()));
             stmt.setInt(6, projeto.getId());
 
             int linhasAfetadas = stmt.executeUpdate();
             if (linhasAfetadas > 0) {
                 System.out.println("Projeto atualizado com sucesso!");
             } else {
-                System.out.println("Projeto não encontrado ou falha ao atualizar.");
+                throw new ProjetoNaoEncontradoException("Projeto com ID " + projeto.getId() + " não encontrado.");
             }
         } catch (SQLException e) {
-            System.err.println("Erro 500: Erro ao atualizar projeto: " + e.getMessage());
+            throw new RuntimeException("Erro ao atualizar projeto: " + e.getMessage(), e);
         }
     }
 
-    
-    public static void deletarProjeto(int id) {
+    public static void deletarProjeto(int id) throws ProjetoNaoEncontradoException {
         deletarDoacoesDoProjeto(id);
 
         String sql = "DELETE FROM projeto WHERE id = ?";
-        try (Connection conexao = Conexao.conectar();
+        try (Connection conexao = Conexao.getInstancia().getConexao();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
@@ -187,30 +189,46 @@ public class ProjetoDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Projeto deletado com sucesso!");
             } else {
-                System.out.println("Projeto não encontrado ou falha ao deletar.");
+                throw new ProjetoNaoEncontradoException("Projeto com ID " + id + " não encontrado.");
             }
         } catch (SQLException e) {
-            System.err.println("Erro 500: Erro ao deletar projeto: " + e.getMessage());
+            throw new RuntimeException("Erro ao deletar projeto: " + e.getMessage(), e);
         }
     }
 
+    public static boolean existeProjeto(int id_projeto) {
+        String sql = "SELECT COUNT(*) FROM projeto WHERE id = ?";
+        try (Connection conexao = Conexao.getInstancia().getConexao();
+             PreparedStatement stmt = conexao.prepareStatement(sql)) {
     
-    public static void deletarDoacoesDoProjeto(int idProjeto) {
+            stmt.setInt(1, id_projeto);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao verificar existência do projeto: " + e.getMessage(), e);
+        }
+        return false;
+    }
+
+    private static void deletarDoacoesDoProjeto(int idProjeto) {
         String sql = "DELETE FROM doacao WHERE id_projeto = ?";
-        try (Connection conexao = Conexao.conectar();
+        try (Connection conexao = Conexao.getInstancia().getConexao();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setInt(1, idProjeto);
             stmt.executeUpdate();
             System.out.println("Doações do projeto deletadas com sucesso!");
         } catch (SQLException e) {
-            System.err.println("Erro 500: Erro ao deletar doações do projeto: " + e.getMessage());
+            throw new RuntimeException("Erro ao deletar doações do projeto: " + e.getMessage(), e);
         }
     }
 
     public static BigDecimal calculaTotalArrecadado(Projeto proj, int meses) {
         String sql = "SELECT SUM(valor) FROM doacao WHERE id_projeto = ? AND data_criacao BETWEEN DATE_SUB(NOW(), INTERVAL ? MONTH) AND NOW()";
-        try (Connection conexao = Conexao.conectar();
+        try (Connection conexao = Conexao.getInstancia().getConexao();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setInt(1, proj.getId());
@@ -222,7 +240,7 @@ public class ProjetoDAO {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Erro 500: Erro ao calcular total arrecadado: " + e.getMessage());
+            throw new RuntimeException("Erro ao calcular total arrecadado: " + e.getMessage(), e);
         }
         return BigDecimal.ZERO;
     }

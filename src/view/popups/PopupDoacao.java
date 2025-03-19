@@ -90,18 +90,16 @@ public class PopupDoacao extends JDialog {
             }
 
             Doacao novaDoacao = new Doacao(0, valor.doubleValue(), new Date(), usuarioLogado.getId(), projetoSelecionado.getId());
-            boolean sucesso = DoacaoDAO.registrarDoacao(novaDoacao);
+            DoacaoDAO.registrarDoacao(novaDoacao); 
 
-            if (sucesso) {
-                JOptionPane.showMessageDialog(this, "Doação registrada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-                projetoSelecionado.setArrecadacao(projetoSelecionado.getArrecadacao().add(valor));
-            
-                if (onDoacaoSuccess != null) {
-                    onDoacaoSuccess.run();
-                }
-            
-                dispose();
+            JOptionPane.showMessageDialog(this, "Doação registrada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+            projetoSelecionado.setArrecadacao(projetoSelecionado.getArrecadacao().add(valor));
+        
+            if (onDoacaoSuccess != null) {
+                onDoacaoSuccess.run();
             }
+        
+            dispose();
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Digite um valor válido!", "Erro", JOptionPane.ERROR_MESSAGE);
         }

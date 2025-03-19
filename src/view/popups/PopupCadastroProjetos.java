@@ -2,6 +2,7 @@ package view.popups;
 
 import DAO.ProjetoDAO;
 import classes.Projeto;
+import exceptions.CampoInvalidoException;
 import java.awt.*;
 import java.math.BigDecimal;
 import javax.swing.*;
@@ -11,7 +12,6 @@ public class PopupCadastroProjetos extends JDialog {
 
     private ProjetosScreen projetosScreen;
 
-    
     public PopupCadastroProjetos(JFrame parent) {
         super(parent, "Cadastrar Projeto", true); 
         setSize(400, 300);
@@ -20,26 +20,25 @@ public class PopupCadastroProjetos extends JDialog {
         getRootPane().setBorder(BorderFactory.createLineBorder(new Color(28, 95, 138), 2, true)); 
 
         
-        if (parent instanceof ProjetosScreen projetosScreen) {
-            this.projetosScreen = projetosScreen;
+        if (parent instanceof ProjetosScreen screen) {
+            this.projetosScreen = screen;
         }
-        
-        // Painel principal do popup
+
         JPanel popupPanel = new JPanel();
         popupPanel.setLayout(new BoxLayout(popupPanel, BoxLayout.Y_AXIS));
         popupPanel.setBackground(Color.WHITE);
-        popupPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); 
+        popupPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Campo "Nome"
+       
         JLabel nomeLabel = new JLabel("Nome:");
         nomeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         popupPanel.add(nomeLabel);
         JTextField nomeField = new JTextField(20);
         nomeField.setMaximumSize(new Dimension(300, 30));
         popupPanel.add(nomeField);
-        popupPanel.add(Box.createVerticalStrut(10)); 
+        popupPanel.add(Box.createVerticalStrut(10)); // Espaçamento
 
-        // Campo "Descrição"
+        
         JLabel descricaoLabel = new JLabel("Descrição:");
         descricaoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         popupPanel.add(descricaoLabel);
@@ -51,7 +50,7 @@ public class PopupCadastroProjetos extends JDialog {
         popupPanel.add(descricaoScroll);
         popupPanel.add(Box.createVerticalStrut(10));
 
-        // Campo "Meta Financeira"
+        
         JLabel metaLabel = new JLabel("Meta Financeira:");
         metaLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         popupPanel.add(metaLabel);
@@ -60,7 +59,7 @@ public class PopupCadastroProjetos extends JDialog {
         popupPanel.add(metaField);
         popupPanel.add(Box.createVerticalStrut(20));
 
-        // Botão "Salvar"
+       
         JButton salvarButton = new JButton("Salvar");
         salvarButton.setBackground(new Color(28, 95, 138));
         salvarButton.setForeground(Color.WHITE);
@@ -68,45 +67,56 @@ public class PopupCadastroProjetos extends JDialog {
         salvarButton.setFocusPainted(false);
         salvarButton.setPreferredSize(new Dimension(100, 30));
 
-        // Ação do botão "Salvar"
+        
         salvarButton.addActionListener(e -> {
-            // Validação dos campos
             String nome = nomeField.getText().trim();
             String descricao = descricaoField.getText().trim();
             String metaStr = metaField.getText().trim();
 
-            if (nome.isEmpty() || descricao.isEmpty() || metaStr.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Preencha todos os campos!", "Erro", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
             try {
-                // Converte a meta financeira para BigDecimal
+                
+                if (nome.isEmpty()) {
+                    throw new CampoInvalidoException("O campo 'Nome' não pode estar vazio!");
+                }
+                if (descricao.isEmpty()) {
+                    throw new CampoInvalidoException("O campo 'Descrição' não pode estar vazio!");
+                }
+                if (metaStr.isEmpty()) {
+                    throw new CampoInvalidoException("O campo 'Meta Financeira' não pode estar vazio!");
+                }
+
+                
                 BigDecimal metaFinanceira = new BigDecimal(metaStr);
 
-                // Criar um novo projeto
+                
+                if (metaFinanceira.compareTo(BigDecimal.ZERO) < 0) {
+                    throw new CampoInvalidoException("A meta financeira não pode ser negativa!");
+                }
+
+                
                 Projeto projeto = new Projeto();
                 projeto.setNome(nome);
                 projeto.setDescricao(descricao);
                 projeto.setMetaFinanceira(metaFinanceira);
                 projeto.setArrecadacao(BigDecimal.ZERO); 
 
-                // Insere o projeto no banco de dados
+                
                 ProjetoDAO.inserirProjeto(projeto);
 
-                // Mensagem de sucesso
+                
                 JOptionPane.showMessageDialog(this, "Projeto salvo com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
 
+                
                 dispose();
 
-                // Atualiza a lista de projetos, se a tela for ProjetosScreen
+                
                 if (projetosScreen != null) {
                     projetosScreen.atualizarListaProjetos(ProjetoDAO.listaProjeto());
                 }
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Meta financeira inválida! Use números.", "Erro", JOptionPane.ERROR_MESSAGE);
+            } catch (CampoInvalidoException | NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Erro ao salvar projeto: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Erro inesperado: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
             }
         });
 

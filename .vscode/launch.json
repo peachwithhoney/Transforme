@@ -12,7 +12,7 @@
             "type": "java",
             "name": "Launch Main",
             "request": "launch",
-            "mainClass": "main.Main.java",
+            "mainClass": "main.Main",
             "projectName": "Transforme",
             "classPaths": [
                 "lib/mysql-connector-j-9.2.0.jar"

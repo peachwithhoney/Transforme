@@ -11,6 +11,9 @@ public class Conexao {
 
     private Conexao() {
         try {
+            if (conexao == null || conexao.isClosed()) {
+                System.out.println("Conexão fechada. Reabrindo...");
+            }
             String url = "jdbc:mysql://localhost:3306/db_transforme";
             String usuario = "root"; 
             String senha = "root"; 
@@ -30,8 +33,21 @@ public class Conexao {
     }
 
     public Connection getConexao() {
+        try {
+            if (conexao == null || conexao.isClosed()) {
+                System.out.println("Reconectando ao banco de dados...");
+                String url = "jdbc:mysql://localhost:3306/db_transforme";
+                String usuario = "root";
+                String senha = "root";
+    
+                conexao = DriverManager.getConnection(url, usuario, senha);
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao obter conexão: " + e.getMessage());
+        }
         return conexao;
     }
+    
 
     public void fecharConexao() {
         if (conexao != null) {

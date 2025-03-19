@@ -43,7 +43,7 @@ public class UsuarioDAO {
 
             stmt.executeUpdate();
 
-            // Recupera o ID gerado
+            
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     usuario.setId(generatedKeys.getInt(1));

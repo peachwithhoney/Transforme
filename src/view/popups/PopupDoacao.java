@@ -93,7 +93,7 @@ public class PopupDoacao extends JDialog {
             }
 
             Doacao novaDoacao = new Doacao(0, valor.doubleValue(), new Date(), usuarioLogado.getId(), projetoSelecionado.getId());
-            DoacaoDAO.registrarDoacao(novaDoacao); // Método pode lançar exceções
+            DoacaoDAO.registrarDoacao(novaDoacao);
 
             JOptionPane.showMessageDialog(this, "Doação registrada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             projetoSelecionado.setArrecadacao(projetoSelecionado.getArrecadacao().add(valor));
